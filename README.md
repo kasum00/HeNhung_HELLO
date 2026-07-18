@@ -1,7 +1,7 @@
 # Báo cáo BTL Hệ Nhúng Nhóm Hello
-# Cấu hình chân STM32F429I-DISCO
+## Cấu hình chân STM32F429I-DISCO
 
-## Bảng cấu hình chân
+### Bảng cấu hình chân
 
 | Thiết bị/chức năng | Ngoại vi | Chân STM32 | Cấu hình trong STM32CubeMX | Thông số chi tiết |
 |---|---|---|---|---|
@@ -32,9 +32,9 @@
 > Giữ nguyên các chân và ngoại vi đang dùng cho TouchGFX, LTDC, FMC/SDRAM, DMA2D và LCD. Không sử dụng `Clear Pinouts` hoặc `Reset Configuration`.
 
 
-# Thiết kế giao diện TouchGFX
+## Thiết kế giao diện TouchGFX
 
-## Tổng quan giao diện
+### Tổng quan giao diện
 
 Giao diện của hệ thống được xây dựng bằng TouchGFX trên màn hình của bo STM32F429I-DISCO. Giao diện gồm ba màn hình chính, cho phép người dùng lựa chọn chế độ hiển thị, theo dõi các thông số đo theo thời gian thực và quan sát sự thay đổi của dữ liệu dưới dạng đồ thị.
 
@@ -48,7 +48,7 @@ Các màn hình sử dụng bố cục đơn giản, màu sắc thống nhất v
 | Screen2 – Màn hình thông số | Hiển thị dữ liệu đo dưới dạng số | Nhịp tim, SpO₂, thời gian đo và trạng thái của người dùng | Nút `<` quay về Screen1; `CHUYỂN SANG ĐỒ THỊ` chuyển sang Screen3 |
 | Screen3 – Màn hình đồ thị | Hiển thị lịch sử biến đổi của dữ liệu | Giá trị nhịp tim hiện tại, đồ thị nhịp tim, giá trị SpO₂ hiện tại, đồ thị SpO₂ và các mốc thời gian | Nút `<` quay về Screen1; `XEM THÔNG SỐ` chuyển sang Screen2 |
 
-## Màn hình 1 – Màn hình lựa chọn
+### Màn hình 1 – Màn hình lựa chọn
 
 Screen1 là màn hình được hiển thị đầu tiên khi hệ thống khởi động. Màn hình có vai trò giới thiệu chức năng chính của thiết bị và cho phép người dùng lựa chọn kiểu hiển thị dữ liệu.
 
@@ -59,7 +59,7 @@ Phần giữa màn hình gồm hai nút chức năng:
 
 Thiết kế của Screen1 được tối giản để người dùng có thể nhận biết và lựa chọn chức năng ngay khi khởi động hệ thống.
 
-## Màn hình 2 – Hiển thị thông số
+### Màn hình 2 – Hiển thị thông số
 
 Screen2 hiển thị trực tiếp các giá trị được thu thập từ cảm biến và RTC. Các thông số được bố trí thành từng vùng riêng biệt nhằm tăng khả năng quan sát.
 
@@ -74,7 +74,7 @@ Các giá trị BPM, SpO₂, thời gian và trạng thái được khai báo d�
 
 Khi dữ liệu nằm ngoài giới hạn cho phép, nội dung trạng thái được thay đổi để thông báo cho người dùng. Đồng thời, hệ thống kích hoạt LED và còi cảnh báo theo logic điều khiển của chương trình.
 
-## Màn hình 3 – Hiển thị đồ thị
+### Màn hình 3 – Hiển thị đồ thị
 
 Screen3 được sử dụng để biểu diễn sự thay đổi của nhịp tim và SpO₂ theo thời gian. Màn hình gồm hai đồ thị đường được bố trí theo chiều dọc.
 
@@ -90,7 +90,7 @@ Screen3 được sử dụng để biểu diễn sự thay đổi của nhịp t
 
 Do hai đồ thị được cập nhật cùng thời điểm, các mốc thời gian được bố trí thống nhất nhằm giúp người dùng dễ dàng so sánh dữ liệu.
 
-## Luồng chuyển màn hình
+### Luồng chuyển màn hình
 
 | Màn hình hiện tại | Thao tác | Màn hình tiếp theo |
 |---|---|---|
