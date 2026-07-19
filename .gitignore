@@ -1,0 +1,14 @@
+*.md
+!readme.md
+*.txt
+
+STM32CubeIDE/Debug/
+STM32CubeIDE/.settings/
+STM32CubeIDE/*.launch
+
+Tests/*
+
+.mxproject
+mx.scratch
+nul
+TouchGFX/build/
