@@ -10,18 +10,18 @@ Dự án **đồ án lớn môn Hệ nhúng** — thiết bị **đo SpO2 & nh�
 
 ## 🔧 Phần cứng
 
-| Thành phần | Chi tiết |
-|---|---|
-| **MCU** | STM32F429ZIT6 (Cortex-M4, 180 MHz, LQFP144) |
-| **Board** | STM32F429I-DISCO REV D01 |
-| **Màn hình** | ILI9341 LCD 320×240px RGB565, SPI5 |
-| **RAM ngoài** | SDRAM qua FMC (frame buffer TouchGFX) |
-| **Cảm biến** | MAX30102 (PPG: SpO2 + BPM) — I2C3, addr 0x57 |
-| **RTC** | DS1307 — I2C3 dùng chung, addr 0x68 |
-| **Buzzer** | PWM trên TIM10_CH1 (PF6) |
-| **Nút nhấn** | B1 (PA0, EXTI0, ngắt sườn lên) |
-| **LED cảnh báo** | PG13 (LD3), PG14 (LD4) |
-| **UART** | USART1 (PA9/PA10, 921600 baud) |
+| Thành phần       | Chi tiết                                     |
+| ---------------- | -------------------------------------------- |
+| **MCU**          | STM32F429ZIT6 (Cortex-M4, 180 MHz, LQFP144)  |
+| **Board**        | STM32F429I-DISCO REV D01                     |
+| **Màn hình**     | ILI9341 LCD 320×240px RGB565, SPI5           |
+| **RAM ngoài**    | SDRAM qua FMC (frame buffer TouchGFX)        |
+| **Cảm biến**     | MAX30102 (PPG: SpO2 + BPM) — I2C3, addr 0x57 |
+| **RTC**          | DS1307 — I2C3 dùng chung, addr 0x68          |
+| **Buzzer**       | PWM trên TIM10_CH1 (PF6)                     |
+| **Nút nhấn**     | B1 (PA0, EXTI0, ngắt sườn lên)               |
+| **LED cảnh báo** | PG13 (LD3), PG14 (LD4)                       |
+| **UART**         | USART1 (PA9/PA10, 921600 baud)               |
 
 ---
 
@@ -133,35 +133,35 @@ DefaultTask ──► PpgQueue (SPSC)
 
 ## 🔑 Điểm đặc biệt
 
-| # | Đặc điểm | Mô tả |
-|---|-----------|-------|
-| 1 | **Bus I2C dùng chung** | MAX30102 + DS1307 trên I2C3, tuần tự hóa bằng mutex FreeRTOS |
-| 2 | **Seqlock** | Lock-free reader/writer giữa DSP và GUI, không bao giờ đọc dữ liệu bị xé |
-| 3 | **Hysteresis thời gian** | Vượt ngưỡng 2s mới bật cảnh báo, bình thường 3s mới tắt |
-| 4 | **Multi-stage filtering** | Median → Lowpass → Moving Average — loại bỏ nhiễu hiệu quả |
-| 5 | **FIFO overflow tracking** | Đếm sample bị mất, hiển thị trên GUI |
-| 6 | **Moving average adjustable** | Người dùng chỉnh cỡ cửa sổ lọc qua UI |
-| 7 | **Không cấp phát bộ nhớ động** | Toàn bộ buffer tĩnh, phù hợp hệ nhúng |
-| 8 | **Config tập trung** | Mọi ngưỡng, timing đều nằm trong `Config/` |
+| #   | Đặc điểm                       | Mô tả                                                                    |
+| --- | ------------------------------ | ------------------------------------------------------------------------ |
+| 1   | **Bus I2C dùng chung**         | MAX30102 + DS1307 trên I2C3, tuần tự hóa bằng mutex FreeRTOS             |
+| 2   | **Seqlock**                    | Lock-free reader/writer giữa DSP và GUI, không bao giờ đọc dữ liệu bị xé |
+| 3   | **Hysteresis thời gian**       | Vượt ngưỡng 2s mới bật cảnh báo, bình thường 3s mới tắt                  |
+| 4   | **Multi-stage filtering**      | Median → Lowpass → Moving Average — loại bỏ nhiễu hiệu quả               |
+| 5   | **FIFO overflow tracking**     | Đếm sample bị mất, hiển thị trên GUI                                     |
+| 6   | **Moving average adjustable**  | Người dùng chỉnh cỡ cửa sổ lọc qua UI                                    |
+| 7   | **Không cấp phát bộ nhớ động** | Toàn bộ buffer tĩnh, phù hợp hệ nhúng                                    |
+| 8   | **Config tập trung**           | Mọi ngưỡng, timing đều nằm trong `Config/`                               |
 
 ---
 
 ## 📊 Thông số kỹ thuật
 
-| Thông số | Giá trị |
-|---|---|
-| Tần số lấy mẫu PPG | 100 Hz |
-| Chu kỳ poll sensor | 20 ms |
-| DSP tick | 10 ms (~100 Hz) |
-| Ngưỡng BPM thấp | < 45 BPM (bradycardia) |
-| Ngưỡng BPM cao | > 120 BPM (tachycardia) |
-| Ngưỡng SpO2 thấp | < 92% (hypoxia) |
-| Thời gian xác nhận cảnh báo | 2 giây |
-| Thời gian gỡ cảnh báo | 3 giây |
-| Số điểm waveform | 240 điểm |
-| Số peak giữ lại | 12 peak/cửa sổ |
-| Số interval BPM cho median | 5 |
-| Tần số UART telemetry | 921600 baud |
+| Thông số                    | Giá trị                 |
+| --------------------------- | ----------------------- |
+| Tần số lấy mẫu PPG          | 100 Hz                  |
+| Chu kỳ poll sensor          | 20 ms                   |
+| DSP tick                    | 10 ms (~100 Hz)         |
+| Ngưỡng BPM thấp             | < 45 BPM (bradycardia)  |
+| Ngưỡng BPM cao              | > 120 BPM (tachycardia) |
+| Ngưỡng SpO2 thấp            | < 92% (hypoxia)         |
+| Thời gian xác nhận cảnh báo | 2 giây                  |
+| Thời gian gỡ cảnh báo       | 3 giây                  |
+| Số điểm waveform            | 240 điểm                |
+| Số peak giữ lại             | 12 peak/cửa sổ          |
+| Số interval BPM cho median  | 5                       |
+| Tần số UART telemetry       | 921600 baud             |
 
 ---
 
