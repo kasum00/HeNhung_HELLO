@@ -99,10 +99,11 @@ enum class StorageStatus : uint8_t
 /** @brief DSP filter chain selected for display/processing. */
 enum class FilterMode : uint8_t
 {
-    MovingAverage = 0,   /**< Simple moving average.        */
-    Butterworth,         /**< Butterworth band-pass.        */
-    MedianButterworth,   /**< Median pre-filter + Butter.   */
-    Raw                  /**< DC-centered raw (no smoothing).*/
+    Raw = 0,
+    MovingAverage,
+    Median,
+    Lowpass,
+    MedianLowpass   /**< Chuỗi: Median → Lowpass (loại spike + làm mượt). */
 };
 
 
@@ -243,11 +244,12 @@ inline const char* toText(FilterMode mode)
 {
     switch (mode)
     {
-    case FilterMode::Raw:               return "Raw";
-    case FilterMode::MovingAverage:     return "Moving Avg";
-    case FilterMode::Butterworth:       return "Butterworth";
-    case FilterMode::MedianButterworth: return "Median+BW";
-    default:                            return "Unknown";
+    case FilterMode::Raw:            return "Raw";
+    case FilterMode::MovingAverage:  return "MovAvg";
+    case FilterMode::Median:         return "Median";
+    case FilterMode::Lowpass:        return "LowPass";
+    case FilterMode::MedianLowpass:  return "Med+LP";
+    default:                         return "Unknown";
     }
 }
 

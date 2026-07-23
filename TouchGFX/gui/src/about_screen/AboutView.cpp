@@ -70,14 +70,14 @@ void AboutView::setupScreen()
     disclaimerLine1.setPosition(10, layout::about::DISCLAIMER_LINE1_Y, 220, layout::about::DISCLAIMER_LINE_H);
     disclaimerLine1.setColor(theme::warning());
     disclaimerLine1.setTypedText(TypedText(T_WCMEDIUMCENTER));
-    Unicode::strncpy(disclaimer1Buffer, "Nam chan be du.", 28);
+    Unicode::strncpy(disclaimer1Buffer, "Not a medical device.", 28);
     disclaimerLine1.setWildcard1(disclaimer1Buffer);
     add(disclaimerLine1);
 
     disclaimerLine2.setPosition(10, layout::about::DISCLAIMER_LINE2_Y, 220, layout::about::DISCLAIMER_LINE_H);
     disclaimerLine2.setColor(theme::warning());
     disclaimerLine2.setTypedText(TypedText(T_WCMEDIUMCENTER));
-    Unicode::strncpy(disclaimer2Buffer, "Coder bi nghe.", 28);
+    Unicode::strncpy(disclaimer2Buffer, "For educational use only.", 28);
     disclaimerLine2.setWildcard1(disclaimer2Buffer);
     add(disclaimerLine2);
 

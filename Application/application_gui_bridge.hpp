@@ -42,6 +42,13 @@ private:
     MockGuiDataProvider mock_;   /**< ủy quyền cho các màn hình chưa dùng dữ liệu thật */
     PpgResult ppg_;              /**< kết quả engine công bố mới nhất */
     uint32_t generation_;
+    uint32_t resultReadyMs_;     /**< HAL_GetTick khi lần đầu thấy RESULT_READY */
+    bool     wasResultReady_;    /**<prevState == RESULT_READY để detect cạnh lên */
+
+    /** Cấu hình thật (draft + active) cho Settings screen. */
+    GuiConfigurationSnapshot draftConfig_;
+    GuiConfigurationSnapshot activeConfig_;
+    bool draftDirty() const;
 };
 
 } // namespace gui

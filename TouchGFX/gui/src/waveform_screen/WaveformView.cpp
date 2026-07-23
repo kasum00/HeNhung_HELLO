@@ -148,7 +148,18 @@ void WaveformView::onChannel(const TextButton& /*button*/)
 
 void WaveformView::updateControlLabels(FilterMode mode, uint8_t window)
 {
-    modeButton.setLabel((mode == FilterMode::Raw) ? "Raw" : "Mov Avg");
+    const char* label;
+    switch (mode)
+    {
+    case FilterMode::Raw:            label = "Raw";      break;
+    case FilterMode::MovingAverage:  label = "MovAvg";   break;
+    case FilterMode::Median:         label = "Median";   break;
+    case FilterMode::Lowpass:        label = "LowPass";  break;
+    case FilterMode::MedianLowpass:  label = "Med+LP";   break;
+    default:                         label = "Raw";      break;
+    }
+    modeButton.setLabel(label);
+
     char buf[8];
     (void)snprintf(buf, sizeof(buf), "N %u", (unsigned)window);
     windowButton.setLabel(buf);
@@ -158,12 +169,14 @@ void WaveformView::updateControlLabels(FilterMode mode, uint8_t window)
 
 void WaveformView::onFilterMode(const TextButton& /*button*/)
 {
-    /* Toggle the GLOBAL filter mode: affects both this plot and the dashboard
-       values (the engine recomputes on the selected signal). */
-    const FilterMode next = (filterMode == FilterMode::Raw) ? FilterMode::MovingAverage
-                                                            : FilterMode::Raw;
-    presenter->postCommand(makeSelectFilter(next));
-    filterMode = next;
+    /* Cycle: Raw → MovingAverage → Median → Lowpass → MedianLowpass → Raw */
+    int next = static_cast<int>(filterMode) + 1;
+    if (next > static_cast<int>(FilterMode::MedianLowpass))
+    {
+        next = static_cast<int>(FilterMode::Raw);
+    }
+    filterMode = static_cast<FilterMode>(next);
+    presenter->postCommand(makeSelectFilter(filterMode));
     updateControlLabels(filterMode, maWindow);
     refresh();
 }

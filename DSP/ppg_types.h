@@ -55,10 +55,15 @@ typedef enum
  * cho dashboard. Mở rộng được (median/band-pass sau này). SpO2 luôn dùng RAW
  * RED/IR bất kể mode này.
  */
+/* Nguồn tín hiệu phân tích/hiển thị chọn được (toàn cục).
+   SpO2 luôn dùng RAW RED/IR bất kể mode này. */
 typedef enum
 {
-    PPG_FILTER_RAW = 0,         /**< Tín hiệu RAW đã centered (không làm mượt). */
-    PPG_FILTER_MOVING_AVERAGE   /**< Tín hiệu đã moving-average (làm mượt).     */
+    PPG_FILTER_RAW = 0,           /* Tín hiệu RAW đã centered (không lọc). */
+    PPG_FILTER_MOVING_AVERAGE,    /* Moving average (làm mượt). */
+    PPG_FILTER_MEDIAN,            /* Median filter (loại spike). */
+    PPG_FILTER_LOWPASS,           /* Low-pass Butterworth (loại nhiễu cao tần). */
+    PPG_FILTER_MEDIAN_LOWPASS     /* Chuỗi: Median → Lowpass (loại spike + làm mượt). */
 } PpgFilterMode;
 
 /**
@@ -129,6 +134,10 @@ typedef struct
     /* Cửa sổ waveform IR đã centered (cũ nhất..mới nhất). */
     int16_t  waveform[PPG_WAVE_POINTS];
     uint16_t waveformCount;
+
+    /* Cửa sổ waveform RED đã centered (cũ nhất..mới nhất). */
+    int16_t  redWaveform[PPG_WAVE_POINTS];
+    uint16_t redWaveformCount;
     uint16_t peakIndices[PPG_MAX_PEAKS]; /**< Chỉ số trong waveform[] của các peak đã chấp nhận. */
     uint8_t  peakCount;
 } PpgResult;

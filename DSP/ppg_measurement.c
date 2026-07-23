@@ -7,6 +7,8 @@
 
 #include "ppg_measurement.h"
 #include "moving_average_filter.h"
+#include "median_filter.h"
+#include "lowpass_filter.h"
 #include "spo2_estimator.h"
 
 /* -------------------------------------------------------------------------- */
@@ -42,6 +44,19 @@ static MovingAverageFilter s_maRed;
 static int32_t s_lastIrFiltered;
 static int32_t s_lastRedFiltered;
 
+/* Median filter (RED + IR) */
+static int32_t s_medianBufIr[PPG_MA_WINDOW_MAX];
+static int32_t s_medianSortIr[PPG_MA_WINDOW_MAX];
+static MedianFilter s_medianIr;
+
+static int32_t s_medianBufRed[PPG_MA_WINDOW_MAX];
+static int32_t s_medianSortRed[PPG_MA_WINDOW_MAX];
+static MedianFilter s_medianRed;
+
+/* Low-pass filter (RED + IR) */
+static LowpassFilter s_lpIr;
+static LowpassFilter s_lpRed;
+
 /* Nguồn tín hiệu phân tích/hiển thị chọn được (toàn cục) + cỡ cửa sổ đang dùng. */
 static PpgFilterMode s_filterMode;
 static uint8_t s_maWindowN;
@@ -55,11 +70,16 @@ static int32_t s_displayRange;
 static uint32_t s_stateStartMs;
 static uint32_t s_samplesInState;
 
-/* Ring waveform (đã ánh xạ 0..full-scale). */
+/* Ring waveform IR (đã ánh xạ 0..full-scale). */
 static int16_t s_wave[PPG_WAVE_POINTS];
 static uint8_t s_peakFlag[PPG_WAVE_POINTS];
 static uint16_t s_waveHead;   /* vị trí ghi tiếp */
 static uint16_t s_waveFill;   /* số điểm hợp lệ (<= POINTS) */
+
+/* Ring waveform RED (dùng chung envelope + auto-range với IR). */
+static int16_t s_waveRed[PPG_WAVE_POINTS];
+static uint16_t s_waveRedHead;
+static uint16_t s_waveRedFill;
 
 /* Peak detector. */
 static int32_t s_prevFilteredIr;
@@ -132,6 +152,12 @@ static int32_t analysisIr(void)
     return (s_filterMode == PPG_FILTER_RAW) ? s_lastCenteredIr : s_lastIrFiltered;
 }
 
+/** Tín hiệu RED dùng cho waveform display, theo filter mode đã chọn. */
+static int32_t analysisRed(void)
+{
+    return (s_filterMode == PPG_FILTER_RAW) ? s_lastCenteredRed : s_lastRedFiltered;
+}
+
 static void resetPeakDetector(void)
 {
     s_prevValid = false;
@@ -154,11 +180,11 @@ static void resetSession(void)
     s_sessionLastMs = 0U;
     s_sessionRrSumMs = 0U;
     s_sessionRrCount = 0U;
-    s_sessionBpmMin = 0.0F;
+    s_sessionBpmMin = 999.0F;   /* lớn hơn BPM thực để min/max đúng từ peak đầu */
     s_sessionBpmMax = 0.0F;
     s_sessionSpo2Sum = 0.0F;
     s_sessionSpo2Count = 0U;
-    s_sessionSpo2Min = 0.0F;
+    s_sessionSpo2Min = 101.0F;  /* lớn hơn SpO2 thực để min/max đúng từ cửa sổ đầu */
     s_sessionSpo2Max = 0.0F;
     s_sessionSqiSum = 0.0F;
     s_sessionSqiCount = 0U;
@@ -193,6 +219,10 @@ static void resetMeasurement(uint32_t seedIr, uint32_t seedRed, uint32_t nowMs)
     s_lastCenteredRed = 0;
     MovingAverage_Reset(&s_maIr);
     MovingAverage_Reset(&s_maRed);
+    Median_Reset(&s_medianIr);
+    Median_Reset(&s_medianRed);
+    Lowpass_Reset(&s_lpIr);
+    Lowpass_Reset(&s_lpRed);
     s_lastIrFiltered = 0;
     s_lastRedFiltered = 0;
     Spo2_Reset(&s_spo2);
@@ -209,9 +239,12 @@ static void resetMeasurement(uint32_t seedIr, uint32_t seedRed, uint32_t nowMs)
     s_displayRange = PPG_DISPLAY_RANGE_MIN;
     s_waveHead = 0U;
     s_waveFill = 0U;
+    s_waveRedHead = 0U;
+    s_waveRedFill = 0U;
     for (uint16_t i = 0U; i < PPG_WAVE_POINTS; ++i)
     {
         s_wave[i] = PPG_WAVE_ZERO;
+        s_waveRed[i] = PPG_WAVE_ZERO;
         s_peakFlag[i] = 0U;
     }
     resetPeakDetector();
@@ -246,6 +279,14 @@ static void pushWaveformPoint(int32_t centered, uint8_t isPeak)
     s_peakFlag[s_waveHead] = isPeak;
     s_waveHead = (uint16_t)((s_waveHead + 1U) % PPG_WAVE_POINTS);
     if (s_waveFill < PPG_WAVE_POINTS) { ++s_waveFill; }
+
+    /* RED waveform: dùng chung auto-range envelope với IR. */
+    const int32_t redCentered = analysisRed();
+    int32_t redMapped = PPG_WAVE_ZERO + ((redCentered - mid) * span) / s_displayRange;
+    redMapped = clamp32(redMapped, PPG_WAVE_ZERO - span, PPG_WAVE_ZERO + span);
+    s_waveRed[s_waveRedHead] = (int16_t)redMapped;
+    s_waveRedHead = (uint16_t)((s_waveRedHead + 1U) % PPG_WAVE_POINTS);
+    if (s_waveRedFill < PPG_WAVE_POINTS) { ++s_waveRedFill; }
 }
 
 /** Median của các interval đã ghi (copy nhỏ + insertion sort). */
@@ -387,6 +428,15 @@ void Ppg_Init(void)
     s_maWindowN = (uint8_t)PPG_MOVING_AVERAGE_WINDOW;
     (void)MovingAverage_Init(&s_maIr, s_maBufIr, s_maWindowN);
     (void)MovingAverage_Init(&s_maRed, s_maBufRed, s_maWindowN);
+
+    /* Median filter init */
+    Median_Init(&s_medianIr, s_medianBufIr, s_medianSortIr, s_maWindowN);
+    Median_Init(&s_medianRed, s_medianBufRed, s_medianSortRed, s_maWindowN);
+
+    /* Low-pass filter init */
+    Lowpass_Init(&s_lpIr);
+    Lowpass_Init(&s_lpRed);
+
     Spo2_Init(&s_spo2, NULL);   /* calibration thực nghiệm mặc định */
     resetSession();
     s_sessionActive = false;
@@ -406,6 +456,10 @@ void Ppg_SetMaWindow(uint8_t window)
     s_maWindowN = n;
     (void)MovingAverage_Init(&s_maIr, s_maBufIr, n);   /* khởi tạo lại (xóa) */
     (void)MovingAverage_Init(&s_maRed, s_maBufRed, n);
+    Median_Reset(&s_medianIr);
+    Median_Reset(&s_medianRed);
+    Lowpass_Reset(&s_lpIr);
+    Lowpass_Reset(&s_lpRed);
 }
 
 void Ppg_SetSensorError(bool error)
@@ -509,8 +563,34 @@ void Ppg_PushSample(const PpgRawSample* sample)
         s_baselineRed += ((int32_t)red - s_baselineRed) / 16;
         s_lastCenteredIr = (int32_t)ir - s_baselineIr;
         s_lastCenteredRed = (int32_t)red - s_baselineRed;
-        (void)MovingAverage_Process(&s_maIr, s_lastCenteredIr, &s_lastIrFiltered);
-        (void)MovingAverage_Process(&s_maRed, s_lastCenteredRed, &s_lastRedFiltered);
+
+        /* Lọc tín hiệu IR/RED theo chế độ đã chọn */
+        switch (s_filterMode)
+        {
+        case PPG_FILTER_MOVING_AVERAGE:
+            (void)MovingAverage_Process(&s_maIr,  s_lastCenteredIr,  &s_lastIrFiltered);
+            (void)MovingAverage_Process(&s_maRed, s_lastCenteredRed, &s_lastRedFiltered);
+            break;
+        case PPG_FILTER_MEDIAN:
+            s_lastIrFiltered  = Median_Process(&s_medianIr,  s_lastCenteredIr);
+            s_lastRedFiltered = Median_Process(&s_medianRed, s_lastCenteredRed);
+            break;
+        case PPG_FILTER_LOWPASS:
+            s_lastIrFiltered  = Lowpass_Process(&s_lpIr,  s_lastCenteredIr);
+            s_lastRedFiltered = Lowpass_Process(&s_lpRed, s_lastCenteredRed);
+            break;
+        case PPG_FILTER_MEDIAN_LOWPASS:
+            s_lastIrFiltered  = Lowpass_Process(&s_lpIr,
+                                    Median_Process(&s_medianIr, s_lastCenteredIr));
+            s_lastRedFiltered = Lowpass_Process(&s_lpRed,
+                                    Median_Process(&s_medianRed, s_lastCenteredRed));
+            break;
+        case PPG_FILTER_RAW:
+        default:
+            s_lastIrFiltered  = s_lastCenteredIr;
+            s_lastRedFiltered = s_lastCenteredRed;
+            break;
+        }
         updateEnvelope(analysisIr());
 
         const int32_t amplitude = s_envMax - s_envMin;
@@ -546,8 +626,34 @@ void Ppg_PushSample(const PpgRawSample* sample)
         s_baselineRed += ((int32_t)red - s_baselineRed) / (1 << PPG_BASELINE_SHIFT);
         s_lastCenteredIr = (int32_t)ir - s_baselineIr;
         s_lastCenteredRed = (int32_t)red - s_baselineRed;
-        (void)MovingAverage_Process(&s_maIr, s_lastCenteredIr, &s_lastIrFiltered);
-        (void)MovingAverage_Process(&s_maRed, s_lastCenteredRed, &s_lastRedFiltered);
+
+        /* Lọc tín hiệu IR/RED theo chế độ đã chọn */
+        switch (s_filterMode)
+        {
+        case PPG_FILTER_MOVING_AVERAGE:
+            (void)MovingAverage_Process(&s_maIr,  s_lastCenteredIr,  &s_lastIrFiltered);
+            (void)MovingAverage_Process(&s_maRed, s_lastCenteredRed, &s_lastRedFiltered);
+            break;
+        case PPG_FILTER_MEDIAN:
+            s_lastIrFiltered  = Median_Process(&s_medianIr,  s_lastCenteredIr);
+            s_lastRedFiltered = Median_Process(&s_medianRed, s_lastCenteredRed);
+            break;
+        case PPG_FILTER_LOWPASS:
+            s_lastIrFiltered  = Lowpass_Process(&s_lpIr,  s_lastCenteredIr);
+            s_lastRedFiltered = Lowpass_Process(&s_lpRed, s_lastCenteredRed);
+            break;
+        case PPG_FILTER_MEDIAN_LOWPASS:
+            s_lastIrFiltered  = Lowpass_Process(&s_lpIr,
+                                    Median_Process(&s_medianIr, s_lastCenteredIr));
+            s_lastRedFiltered = Lowpass_Process(&s_lpRed,
+                                    Median_Process(&s_medianRed, s_lastCenteredRed));
+            break;
+        case PPG_FILTER_RAW:
+        default:
+            s_lastIrFiltered  = s_lastCenteredIr;
+            s_lastRedFiltered = s_lastCenteredRed;
+            break;
+        }
         updateEnvelope(analysisIr());
 
         const int32_t amplitude = s_envMax - s_envMin;
@@ -570,9 +676,12 @@ void Ppg_PushSample(const PpgRawSample* sample)
         {
             s_reason = PPG_REASON_NONE;
             /* Peak/BPM/waveform chạy trên tín hiệu IR đã chọn (§11). Ở mode moving
-               average thì chờ cửa sổ đầy (luôn đầy khi tới MEASURING); raw thì
-               luôn sẵn sàng. */
+               average thì chờ cửa sổ đầy (luôn đầy khi tới MEASURING); raw, median
+               và lowpass luôn sẵn sàng. */
             const bool sigReady = (s_filterMode == PPG_FILTER_RAW) ||
+                                  (s_filterMode == PPG_FILTER_MEDIAN) ||
+                                  (s_filterMode == PPG_FILTER_LOWPASS) ||
+                                  (s_filterMode == PPG_FILTER_MEDIAN_LOWPASS) ||
                                   MovingAverage_IsReady(&s_maIr);
             if (sigReady)
             {
@@ -665,8 +774,8 @@ void Ppg_GetResult(PpgResult* out)
                                  ? (s_sessionLastMs - s_sessionStartMs) : 0U;
     out->elapsedMeasurementMs = elapsed;
     out->validRrCount = s_sessionRrCount;
-    out->bpmMin = s_sessionBpmMin;
-    out->bpmMax = s_sessionBpmMax;
+    out->bpmMin = (s_sessionRrCount > 0U) ? s_sessionBpmMin : 0.0F;
+    out->bpmMax = (s_sessionRrCount > 0U) ? s_sessionBpmMax : 0.0F;
     out->averageBpm = 0.0F;
     out->averageBpmValid = false;
     if (s_sessionRrCount >= MEASUREMENT_MIN_RR_INTERVALS)
@@ -706,8 +815,8 @@ void Ppg_GetResult(PpgResult* out)
         ? (s_sessionSpo2Sum / (float)s_sessionSpo2Count) : 0.0F;
     out->averageSpo2Valid = (s_sessionSpo2Count >= MEASUREMENT_MIN_SPO2_WINDOWS) &&
                             (elapsed >= MEASUREMENT_MIN_DURATION_MS);
-    out->spo2Min = s_sessionSpo2Min;
-    out->spo2Max = s_sessionSpo2Max;
+    out->spo2Min = (s_sessionSpo2Count > 0U) ? s_sessionSpo2Min : 0.0F;
+    out->spo2Max = (s_sessionSpo2Count > 0U) ? s_sessionSpo2Max : 0.0F;
     out->validSpo2Windows = s_sessionSpo2Count;
     out->sqiPercent = measuring ? s_sqiPercent : 0.0F;
     out->averageSqi = (s_sessionSqiCount > 0U)
@@ -742,6 +851,21 @@ void Ppg_GetResult(PpgResult* out)
     for (uint16_t i = s_waveFill; i < PPG_WAVE_POINTS; ++i)
     {
         out->waveform[i] = PPG_WAVE_ZERO;
+    }
+
+    /* Xuất cửa sổ waveform RED theo thứ tự thời gian. */
+    out->redWaveformCount = s_waveRedFill;
+    const uint16_t startRed = (s_waveRedFill < PPG_WAVE_POINTS)
+                                  ? 0U
+                                  : s_waveRedHead;
+    for (uint16_t i = 0U; i < s_waveRedFill; ++i)
+    {
+        const uint16_t src = (uint16_t)((startRed + i) % PPG_WAVE_POINTS);
+        out->redWaveform[i] = s_waveRed[src];
+    }
+    for (uint16_t i = s_waveRedFill; i < PPG_WAVE_POINTS; ++i)
+    {
+        out->redWaveform[i] = PPG_WAVE_ZERO;
     }
     if (!out->waveformVisible)
     {
