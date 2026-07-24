@@ -13,7 +13,12 @@ extern "C" {
 #include "datetime.h"
 #include "temporary_history_store.h"
 #include "measurement_types.h"
+#include "alert_config.h"
+#include "stm32f4xx_hal.h"
 }
+
+/** Kết quả được coi là stale sau khoảng thời gian này (ms). */
+static constexpr uint32_t RESULT_STALE_TIMEOUT_MS = 60000U;  /* 60 giây */
 
 namespace gui
 {
@@ -47,11 +52,38 @@ MeasurementInvalidReason mapReason(PpgInvalidReason r)
     default:                      return MeasurementInvalidReason::None;
     }
 }
+
+GuiConfigurationSnapshot makeDefaultConfig()
+{
+    GuiConfigurationSnapshot c{};
+    c.generation = 0U;
+    c.filterMode = FilterMode::MovingAverage;  /* khớp PPG engine default */
+    c.minimumSqiPercent = 45U;
+    c.loggingEnabled = true;
+    c.buzzerEnabled = true;
+    c.adaptiveLedEnabled = true;
+    c.brightnessPercent = 80U;
+    c.dirty = false;
+    return c;
+}
 } // namespace
 
 ApplicationGuiBridge::ApplicationGuiBridge()
-    : ppg_(), generation_(1U)
+    : ppg_(), generation_(1U),
+      resultReadyMs_(0U), wasResultReady_(false),
+      draftConfig_(makeDefaultConfig()),
+      activeConfig_(makeDefaultConfig())
 {
+}
+
+bool ApplicationGuiBridge::draftDirty() const
+{
+    return (draftConfig_.filterMode != activeConfig_.filterMode) ||
+           (draftConfig_.minimumSqiPercent != activeConfig_.minimumSqiPercent) ||
+           (draftConfig_.loggingEnabled != activeConfig_.loggingEnabled) ||
+           (draftConfig_.buzzerEnabled != activeConfig_.buzzerEnabled) ||
+           (draftConfig_.adaptiveLedEnabled != activeConfig_.adaptiveLedEnabled) ||
+           (draftConfig_.brightnessPercent != activeConfig_.brightnessPercent);
 }
 
 void ApplicationGuiBridge::tick(uint32_t frameCounter)
@@ -81,8 +113,16 @@ void ApplicationGuiBridge::postCommand(const GuiCommand& command)
     }
     if (command.type == GuiCommandType::SelectFilter)
     {
-        const PpgFilterMode mode = (command.filterMode == FilterMode::Raw)
-                                       ? PPG_FILTER_RAW : PPG_FILTER_MOVING_AVERAGE;
+        PpgFilterMode mode;
+        switch (command.filterMode)
+        {
+        case FilterMode::Raw:           mode = PPG_FILTER_RAW;            break;
+        case FilterMode::MovingAverage: mode = PPG_FILTER_MOVING_AVERAGE; break;
+        case FilterMode::Median:        mode = PPG_FILTER_MEDIAN;         break;
+        case FilterMode::Lowpass:       mode = PPG_FILTER_LOWPASS;        break;
+        case FilterMode::MedianLowpass: mode = PPG_FILTER_MEDIAN_LOWPASS; break;
+        default:                        mode = PPG_FILTER_MOVING_AVERAGE; break;
+        }
         DspTask_SetFilterMode(mode);
         return;
     }
@@ -91,8 +131,39 @@ void ApplicationGuiBridge::postCommand(const GuiCommand& command)
         DspTask_SetMaWindow(command.filterWindow);
         return;
     }
-    /* Settings / scenario tạm thời vẫn do mock phục vụ. */
-    mock_.postCommand(command);
+    /* Settings commands — lưu vào draft config, apply khi user bấm Apply. */
+    switch (command.type)
+    {
+    case GuiCommandType::SetMinimumSqi:
+        draftConfig_.minimumSqiPercent = command.minimumSqiPercent;
+        break;
+    case GuiCommandType::SetLoggingEnabled:
+        draftConfig_.loggingEnabled = command.flag;
+        break;
+    case GuiCommandType::SetBuzzerEnabled:
+        draftConfig_.buzzerEnabled = command.flag;
+        break;
+    case GuiCommandType::SetAdaptiveLedEnabled:
+        draftConfig_.adaptiveLedEnabled = command.flag;
+        break;
+    case GuiCommandType::SetBrightness:
+        draftConfig_.brightnessPercent = command.brightnessPercent;
+        break;
+    case GuiCommandType::ApplySettings:
+        activeConfig_ = draftConfig_;
+        activeConfig_.dirty = false;
+        draftConfig_.dirty = false;
+        break;
+    case GuiCommandType::CancelSettings:
+        draftConfig_ = activeConfig_;
+        break;
+    case GuiCommandType::RestoreDefaults:
+        draftConfig_ = makeDefaultConfig();
+        break;
+    default:
+        mock_.postCommand(command);
+        break;
+    }
 }
 
 void ApplicationGuiBridge::notifyScreenTransition()
@@ -111,7 +182,24 @@ bool ApplicationGuiBridge::getMeasurementSnapshot(GuiMeasurementSnapshot& snapsh
     snapshot.spo2Percent = ppg_.spo2;
     snapshot.spo2Valid = ppg_.spo2Valid;
     snapshot.sqiPercent = ppg_.sqiPercent;
-    snapshot.stale = false;
+
+    /* Stale detection: ghi lại thời điểm lần đầu thấy RESULT_READY.
+       Nếu kết quả đã ngồi chờ quá lâu → đánh dấu stale. */
+    if (ppg_.resultReady)
+    {
+        if (!wasResultReady_)
+        {
+            resultReadyMs_ = HAL_GetTick();
+            wasResultReady_ = true;
+        }
+        const uint32_t elapsed = HAL_GetTick() - resultReadyMs_;
+        snapshot.stale = (elapsed >= RESULT_STALE_TIMEOUT_MS);
+    }
+    else
+    {
+        wasResultReady_ = false;
+        snapshot.stale = false;
+    }
 
     snapshot.averageBpm = ppg_.averageBpm;
     snapshot.averageBpmValid = ppg_.averageBpmValid;
@@ -120,6 +208,11 @@ bool ApplicationGuiBridge::getMeasurementSnapshot(GuiMeasurementSnapshot& snapsh
     snapshot.elapsedMeasurementMs = ppg_.elapsedMeasurementMs;
     snapshot.validPeakCount = ppg_.validRrCount;
     snapshot.validSpo2WindowCount = ppg_.validSpo2Windows;
+    snapshot.bpmMin = ppg_.bpmMin;
+    snapshot.bpmMax = ppg_.bpmMax;
+    snapshot.spo2Min = ppg_.spo2Min;
+    snapshot.spo2Max = ppg_.spo2Max;
+    snapshot.averageSqi = ppg_.averageSqi;
     snapshot.resultReady = ppg_.resultReady;
     snapshot.temporarilySaved = ppg_.resultSaved;
 
@@ -139,8 +232,15 @@ bool ApplicationGuiBridge::getMeasurementSnapshot(GuiMeasurementSnapshot& snapsh
     snapshot.droppedSampleCount = ppg_.droppedSamples;
     snapshot.fifoOverflowCount = ppg_.fifoOverflows;
 
-    snapshot.filterMode = (ppg_.filterMode == PPG_FILTER_RAW) ? FilterMode::Raw
-                                                             : FilterMode::MovingAverage;
+    switch (ppg_.filterMode)
+    {
+    case PPG_FILTER_RAW:            snapshot.filterMode = FilterMode::Raw;            break;
+    case PPG_FILTER_MOVING_AVERAGE: snapshot.filterMode = FilterMode::MovingAverage;  break;
+    case PPG_FILTER_MEDIAN:         snapshot.filterMode = FilterMode::Median;         break;
+    case PPG_FILTER_LOWPASS:        snapshot.filterMode = FilterMode::Lowpass;        break;
+    case PPG_FILTER_MEDIAN_LOWPASS: snapshot.filterMode = FilterMode::MedianLowpass;  break;
+    default:                        snapshot.filterMode = FilterMode::Raw;            break;
+    }
     snapshot.maWindow = ppg_.maWindow;
 
     DateTime dt;
@@ -162,7 +262,7 @@ bool ApplicationGuiBridge::getWaveformSnapshot(GuiWaveformSnapshot& snapshot)
     snapshot.sampleRateHz = PPG_SAMPLE_RATE_HZ;
     snapshot.count = ppg_.waveformCount;
     snapshot.irChannelValid = (g_sensorOk != 0);
-    snapshot.redChannelValid = false;             /* chỉ công bố IR */
+    snapshot.redChannelValid = (g_sensorOk != 0);
     snapshot.sensorStatus = (g_sensorOk != 0) ? SensorStatus::Ok : SensorStatus::Error;
     snapshot.droppedSamples = ppg_.droppedSamples;
 
@@ -171,11 +271,20 @@ bool ApplicationGuiBridge::getWaveformSnapshot(GuiWaveformSnapshot& snapshot)
     for (uint16_t i = 0U; i < n; ++i)
     {
         snapshot.irSamples[i] = ppg_.waveform[i];
-        snapshot.redSamples[i] = ppg_.waveform[i];
     }
     for (uint16_t i = n; i < WAVEFORM_POINTS; ++i)
     {
         snapshot.irSamples[i] = 0;
+    }
+
+    const uint16_t nRed = (ppg_.redWaveformCount <= WAVEFORM_POINTS) ? ppg_.redWaveformCount
+                                                                    : WAVEFORM_POINTS;
+    for (uint16_t i = 0U; i < nRed; ++i)
+    {
+        snapshot.redSamples[i] = ppg_.redWaveform[i];
+    }
+    for (uint16_t i = nRed; i < WAVEFORM_POINTS; ++i)
+    {
         snapshot.redSamples[i] = 0;
     }
 
@@ -230,8 +339,24 @@ bool ApplicationGuiBridge::getHistoryPage(uint16_t pageIndex, GuiHistoryPageSnap
     return true;
 }
 
-/* Các màn hình chưa dùng dữ liệu thật do mock nội bộ phục vụ. */
-bool ApplicationGuiBridge::getConfigurationSnapshot(GuiConfigurationSnapshot& s) { return mock_.getConfigurationSnapshot(s); }
-bool ApplicationGuiBridge::getSystemInfoSnapshot(GuiSystemInfoSnapshot& s) { return mock_.getSystemInfoSnapshot(s); }
+bool ApplicationGuiBridge::getConfigurationSnapshot(GuiConfigurationSnapshot& s)
+{
+    s = draftConfig_;
+    s.generation = generation_++;
+    s.dirty = draftDirty();
+    return true;
+}
+
+bool ApplicationGuiBridge::getSystemInfoSnapshot(GuiSystemInfoSnapshot& s)
+{
+    s.projectName = "PPG Signal Analyzer";
+    s.firmwareVersion = "v1.0.0";
+    s.buildProfile = "Release";
+    s.mcu = "STM32F429ZIT6";
+    s.displayResolution = "240 x 320";
+    s.sensorName = "MAX30102";
+    s.algorithmStatus = "Real-time";
+    return true;
+}
 
 } // namespace gui

@@ -57,6 +57,13 @@ struct GuiMeasurementSnapshot
     uint32_t validPeakCount;          /**< Accepted RR intervals this session. */
     uint32_t validSpo2WindowCount;    /**< Valid SpO2 windows this session.    */
 
+    /* Session min/max (empty khi chưa có giá trị hợp lệ). */
+    float bpmMin;                     /**< Session min BPM.                    */
+    float bpmMax;                     /**< Session max BPM.                    */
+    float spo2Min;                    /**< Session min SpO2 %.                 */
+    float spo2Max;                    /**< Session max SpO2 %.                 */
+    float averageSqi;                 /**< Session average SQI %.              */
+
     bool resultReady;                 /**< Finalized result available.         */
     bool temporarilySaved;            /**< Added to the RAM history store.      */
 

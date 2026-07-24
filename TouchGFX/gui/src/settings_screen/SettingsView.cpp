@@ -160,7 +160,7 @@ void SettingsView::onValue(const TextButton& button)
     {
     case ID_FILTER:
     {
-        const uint8_t next = static_cast<uint8_t>((static_cast<uint8_t>(c.filterMode) + 1U) % 3U);
+        const uint8_t next = static_cast<uint8_t>((static_cast<uint8_t>(c.filterMode) + 1U) % 5U);
         presenter->postCommand(makeSelectFilter(static_cast<FilterMode>(next)));
         break;
     }

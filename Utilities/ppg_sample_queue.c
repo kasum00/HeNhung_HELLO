@@ -5,6 +5,7 @@
  */
 
 #include "ppg_sample_queue.h"
+#include "stm32f4xx_hal.h"   /* __DMB() từ CMSIS */
 
 #define QUEUE_CAPACITY   256U           /* lũy thừa của 2 */
 #define QUEUE_MASK       (QUEUE_CAPACITY - 1U)
@@ -35,6 +36,7 @@ bool PpgQueue_Push(const PpgRawSample* sample)
         return false;
     }
     s_ring[head] = *sample;
+    __DMB();                            /* data visible trước khi publish head */
     s_head = next;                      /* publish sau khi ghi */
     return true;
 }
@@ -51,6 +53,7 @@ bool PpgQueue_Pop(PpgRawSample* sample)
         return false;                   /* rỗng */
     }
     *sample = s_ring[tail];
+    __DMB();                             /* đọc xong trước khi giải phóng slot */
     s_tail = (tail + 1U) & QUEUE_MASK;  /* giải phóng slot sau khi đọc */
     return true;
 }

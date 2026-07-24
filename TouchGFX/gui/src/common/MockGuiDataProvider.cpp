@@ -27,7 +27,7 @@ GuiConfigurationSnapshot makeDefaultConfig()
 {
     GuiConfigurationSnapshot c{};
     c.generation = 0U;
-    c.filterMode = FilterMode::Butterworth;
+    c.filterMode = FilterMode::MovingAverage;
     c.minimumSqiPercent = DEFAULT_MIN_SQI;
     c.loggingEnabled = true;
     c.buzzerEnabled = true;
@@ -283,6 +283,11 @@ bool MockGuiDataProvider::getMeasurementSnapshot(GuiMeasurementSnapshot& snapsho
     snapshot.averageSpo2Valid = snapshot.spo2Valid && (measuredMs >= 10000U);
     snapshot.validPeakCount = snapshot.acceptedPeakCount;
     snapshot.validSpo2WindowCount = measuringLike ? (measuredMs / 1000U) : 0U;
+    snapshot.bpmMin = measuringLike ? snapshot.bpm : 0.0F;
+    snapshot.bpmMax = measuringLike ? snapshot.bpm : 0.0F;
+    snapshot.spo2Min = measuringLike ? snapshot.spo2Percent : 0.0F;
+    snapshot.spo2Max = measuringLike ? snapshot.spo2Percent : 0.0F;
+    snapshot.averageSqi = snapshot.sqiPercent;
     snapshot.resultReady = (measurementState == MeasurementState::ResultReady);
     snapshot.temporarilySaved = snapshot.resultReady;
 
@@ -318,7 +323,7 @@ bool MockGuiDataProvider::getConfigurationSnapshot(GuiConfigurationSnapshot& sna
 bool MockGuiDataProvider::getSystemInfoSnapshot(GuiSystemInfoSnapshot& snapshot)
 {
     snapshot.projectName = "PPG Signal Analyzer";
-    snapshot.firmwareVersion = "nam chan be du";
+    snapshot.firmwareVersion = "v1.0.0";
     snapshot.buildProfile = "Prototype";
     snapshot.mcu = "STM32F429ZIT6";
     snapshot.displayResolution = "240 x 320";
