@@ -20,16 +20,16 @@ const char* const FIELD_LABELS[DateTimeSettingsView::FIELD_COUNT] =
     { "Year", "Month", "Day", "Hour", "Min", "Sec" };
 
 constexpr int16_t CUR_Y = 38;
-constexpr int16_t ROW_TOP = 60;
-constexpr int16_t ROW_H = 28;
+constexpr int16_t ROW_TOP = 62;
+constexpr int16_t ROW_H = 30;
 constexpr int16_t LABEL_X = 6;
 constexpr int16_t LABEL_W = 54;
-constexpr int16_t MINUS_X = 60;
-constexpr int16_t STEP_W = 30;
-constexpr int16_t VALUE_X = 94;
-constexpr int16_t VALUE_W = 54;
-constexpr int16_t PLUS_X = 150;
-constexpr int16_t STEP_H = 24;
+constexpr int16_t MINUS_X = 62;
+constexpr int16_t STEP_W = 32;
+constexpr int16_t VALUE_X = 98;
+constexpr int16_t VALUE_W = 50;
+constexpr int16_t PLUS_X = 152;
+constexpr int16_t STEP_H = 26;
 constexpr uint8_t ID_PLUS_OFFSET = 10U;
 constexpr int16_t ID_READ = 100;
 constexpr int16_t ID_SET = 101;
@@ -116,20 +116,20 @@ void DateTimeSettingsView::setupScreen()
         add(plusButton[i]);
     }
 
-    statusText.setPosition(6, 230, SCREEN_WIDTH - 12, 16);
+    statusText.setPosition(6, 236, SCREEN_WIDTH - 12, 16);
     statusText.setColor(theme::textSecondary());
     statusText.setTypedText(TypedText(T_WCSMALLCENTER));
     statusText.setWildcard1(statusBuf);
     add(statusText);
 
-    readButton.setup(8, 252, 108, 40);
+    readButton.setup(8, 258, 108, 42);
     readButton.setColors(theme::surfaceAlt(), theme::primaryDark(), theme::textPrimary());
     readButton.setLabel("Read RTC");
     readButton.setId(ID_READ);
     readButton.setAction(readClicked);
     add(readButton);
 
-    setButton.setup(124, 252, 108, 40);
+    setButton.setup(124, 258, 108, 42);
     setButton.setColors(theme::ok(), theme::primaryDark(), theme::textOnPrimary());
     setButton.setLabel("Set");
     setButton.setId(ID_SET);

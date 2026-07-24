@@ -32,6 +32,12 @@ void TopBar::build(const char* title, bool withBack)
     bar.setColor(theme::statusBar());
     add(bar);
 
+    /* Accent line under the bar for visual separation. */
+    accentLine.setPosition(0, static_cast<int16_t>(HEIGHT - layout::widget::TOPBAR_ACCENT_H),
+                           SCREEN_WIDTH, layout::widget::TOPBAR_ACCENT_H);
+    accentLine.setColor(theme::primary());
+    add(accentLine);
+
     const int16_t titleX = withBack ? layout::widget::TOPBAR_TITLE_X_WITH_BACK
                                     : layout::widget::TOPBAR_TITLE_X_PLAIN;
     const int16_t titleW = static_cast<int16_t>(SCREEN_WIDTH - titleX - layout::MARGIN);

@@ -36,9 +36,7 @@ typedef enum
     APP_SCREEN_DASHBOARD,
     APP_SCREEN_WAVEFORM,
     APP_SCREEN_HISTORY,
-    APP_SCREEN_SETTINGS,
-    APP_SCREEN_DATETIME_SETTINGS,
-    APP_SCREEN_ABOUT
+    APP_SCREEN_DATETIME_SETTINGS
 } ApplicationScreen;
 
 /* -------------------------------------------------------------------------- */

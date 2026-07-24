@@ -36,6 +36,12 @@ public:
                const char* caption, const char* unit);
 
     /**
+     * @brief Sets the accent line colour on top of the card.
+     * @param color Colour for the accent strip.
+     */
+    void setAccentColor(touchgfx::colortype color);
+
+    /**
      * @brief Sets the displayed value from an integer.
      * @param value Numeric value.
      * @param valid When false, shows "--" instead of the number.
@@ -50,6 +56,7 @@ public:
 
 private:
     touchgfx::Box background;
+    touchgfx::Box accentLine;
     touchgfx::TextAreaWithOneWildcard captionText;
     touchgfx::TextAreaWithOneWildcard valueText;
     touchgfx::TextAreaWithOneWildcard unitText;

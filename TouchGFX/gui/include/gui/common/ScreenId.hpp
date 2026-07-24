@@ -25,8 +25,6 @@ enum class ScreenId : uint8_t
     Dashboard,
     Waveform,
     History,
-    Settings,
-    About,
     DateTimeSettings
 };
 

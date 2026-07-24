@@ -67,21 +67,23 @@ constexpr int16_t TOPBAR_TITLE_X_WITH_BACK = 56;
 constexpr int16_t TOPBAR_TITLE_X_PLAIN = 8;
 constexpr int16_t TOPBAR_TITLE_Y = 6;
 constexpr int16_t TOPBAR_TITLE_H = 22;
+constexpr int16_t TOPBAR_ACCENT_H = 2;   /**< Accent line under the TopBar. */
 /* MetricCard */
-constexpr int16_t CARD_CAPTION_Y = 6;
+constexpr int16_t CARD_ACCENT_H = 3;     /**< Coloured accent strip on top of card. */
+constexpr int16_t CARD_CAPTION_Y = 10;
 constexpr int16_t CARD_CAPTION_H = 14;
-constexpr int16_t CARD_VALUE_Y = 20;
+constexpr int16_t CARD_VALUE_Y = 24;
 constexpr int16_t CARD_VALUE_H = 44;
 constexpr int16_t CARD_UNIT_H = 14;   /**< Placed at height - CARD_UNIT_H. */
 /* StatusBadge */
-constexpr int16_t BADGE_TEXT_H = 16;
+constexpr int16_t BADGE_TEXT_H = 20;
 /* InfoRow: label gets width * LABEL_NUM / LABEL_DEN, value gets the rest. */
 constexpr int16_t INFOROW_LABEL_NUM = 1;
 constexpr int16_t INFOROW_LABEL_DEN = 2;
 /* HistoryRow */
-constexpr int16_t HISTROW_LINE1_Y = 3;
+constexpr int16_t HISTROW_LINE1_Y = 4;
 constexpr int16_t HISTROW_LINE1_H = 16;
-constexpr int16_t HISTROW_LINE2_Y = 20;
+constexpr int16_t HISTROW_LINE2_Y = 22;
 constexpr int16_t HISTROW_LINE2_H = 14;
 /* PlaceholderContent */
 constexpr int16_t PLACEHOLDER_NOTE_Y = 150;
@@ -91,17 +93,17 @@ constexpr int16_t PLACEHOLDER_NOTE_H = 22;
 /** @name Boot screen */
 namespace boot
 {
-constexpr int16_t LOGO_SIZE   = 64;
-constexpr int16_t LOGO_Y      = 70;
-constexpr int16_t TITLE_Y     = 150;
-constexpr int16_t TITLE_H     = 34;
-constexpr int16_t VERSION_Y   = 186;
+constexpr int16_t LOGO_SIZE   = 60;
+constexpr int16_t LOGO_Y      = 72;
+constexpr int16_t TITLE_Y     = 148;
+constexpr int16_t TITLE_H     = 30;
+constexpr int16_t VERSION_Y   = 180;
 constexpr int16_t VERSION_H   = 16;
-constexpr int16_t BAR_X       = 30;
+constexpr int16_t BAR_X       = 36;
 constexpr int16_t BAR_W       = SCREEN_W - (2 * BAR_X);
-constexpr int16_t BAR_Y       = 250;
-constexpr int16_t BAR_H       = 10;
-constexpr int16_t STATUS_Y    = BAR_Y + 20;
+constexpr int16_t BAR_Y       = 240;
+constexpr int16_t BAR_H       = 12;
+constexpr int16_t STATUS_Y    = BAR_Y + 22;
 constexpr int16_t STATUS_H    = 20;
 } // namespace boot
 
@@ -115,29 +117,29 @@ constexpr int16_t STATUS_TEXT_H = 16;
 constexpr int16_t CLOCK_W = 86;
 constexpr int16_t CLOCK_Y = 4;
 constexpr int16_t CLOCK_H = 18;
-constexpr int16_t GRID_TOP  = STATUS_BAR_H + 10;
-constexpr int16_t GRID_LEFT = 8;
-constexpr int16_t BTN_W = 108;
-constexpr int16_t BTN_H = 44;
-constexpr int16_t COL_GAP = 8;
-constexpr int16_t ROW_GAP = 10;
+constexpr int16_t GRID_TOP  = STATUS_BAR_H + 12;
+constexpr int16_t GRID_LEFT = 10;
+constexpr int16_t BTN_W = 106;
+constexpr int16_t BTN_H = 48;
+constexpr int16_t COL_GAP = 10;
+constexpr int16_t ROW_GAP = 12;
 } // namespace home
 
 /** @name Dashboard */
 namespace dashboard
 {
 constexpr int16_t BADGE_Y = 40;
-constexpr int16_t BADGE_H = 26;
-constexpr int16_t CARD_Y = 72;
+constexpr int16_t BADGE_H = 28;
+constexpr int16_t CARD_Y = 74;
 constexpr int16_t CARD_W = 72;
-constexpr int16_t CARD_H = 88;
-constexpr int16_t CARD_GAP = 4;
+constexpr int16_t CARD_H = 92;
+constexpr int16_t CARD_GAP = 6;
 constexpr int16_t CARD1_X = 8;
 constexpr int16_t CARD2_X = 84;
 constexpr int16_t CARD3_X = 160;
-constexpr int16_t REASON_Y = 168;
+constexpr int16_t REASON_Y = 174;
 constexpr int16_t REASON_H = 20;
-constexpr int16_t INFO_Y = 192;
+constexpr int16_t INFO_Y = 198;
 constexpr int16_t INFO_H = 14;
 constexpr int16_t ACTION_Y = 228;
 constexpr int16_t ACTION_H = 56;
@@ -150,17 +152,17 @@ constexpr int16_t ACTION_W = 110;
 namespace waveform
 {
 constexpr int16_t CTRL_Y = 40;
-constexpr int16_t CTRL_H = 30;
+constexpr int16_t CTRL_H = 32;
 constexpr int16_t CHANNEL_X = 8;
 constexpr int16_t CHANNEL_W = 70;
 constexpr int16_t MODE_X = 86;
 constexpr int16_t MODE_W = 90;
-constexpr int16_t PLOT_Y = 72;
-constexpr int16_t PLOT_H = 158;   /* taller plot: fills down to just above INFO_Y */
+constexpr int16_t PLOT_Y = 76;
+constexpr int16_t PLOT_H = 156;   /* taller plot: fills down to just above INFO_Y */
 constexpr int16_t PLOT_W = SCREEN_W;
 constexpr int16_t PEAK_MARKER_W = 2;
 constexpr int16_t PEAK_MARKER_H = 12;
-constexpr int16_t INFO_Y = 232;
+constexpr int16_t INFO_Y = 234;
 constexpr int16_t INFO_H = 14;
 } // namespace waveform
 
@@ -169,15 +171,15 @@ namespace history
 {
 constexpr int16_t NAV_Y = 40;
 constexpr int16_t NAV_BTN_W = 56;
-constexpr int16_t NAV_BTN_H = 30;
+constexpr int16_t NAV_BTN_H = 32;
 constexpr int16_t NEXT_X = 176;
 constexpr int16_t PAGE_TEXT_X = 68;
 constexpr int16_t PAGE_TEXT_Y = 46;
 constexpr int16_t PAGE_TEXT_W = 104;
-constexpr int16_t PAGE_TEXT_H = 18;
+constexpr int16_t PAGE_TEXT_H = 20;
 constexpr int16_t ROWS_TOP = 78;
-constexpr int16_t ROW_H = 40;
-constexpr int16_t ROW_GAP = 4;
+constexpr int16_t ROW_H = 44;
+constexpr int16_t ROW_GAP = 2;
 constexpr int16_t STATE_Y = 150;
 constexpr int16_t STATE_H = 20;
 } // namespace history
@@ -187,14 +189,14 @@ constexpr int16_t STATE_H = 20;
 namespace settings
 {
 constexpr int16_t ROW_TOP = 42;
-constexpr int16_t ROW_H = 28;
-constexpr int16_t LABEL_W = 118;
+constexpr int16_t ROW_H = 32;
+constexpr int16_t LABEL_W = 112;
 constexpr int16_t VALUE_X = 128;
 constexpr int16_t VALUE_W = 104;
-constexpr int16_t VALUE_H = 24;
-constexpr int16_t STATUS_Y = 214;
+constexpr int16_t VALUE_H = 26;
+constexpr int16_t STATUS_Y = 220;
 constexpr int16_t STATUS_H = 16;
-constexpr int16_t ACTION_Y = 234;
+constexpr int16_t ACTION_Y = 240;
 constexpr int16_t ACTION_H = 38;
 constexpr int16_t ACTION_W = 72;
 constexpr int16_t APPLY_X = 8;
@@ -208,11 +210,11 @@ namespace about
 constexpr int16_t TITLE_Y = 42;
 constexpr int16_t TITLE_H = 24;
 constexpr int16_t ROWS_TOP = 72;
-constexpr int16_t ROW_H = 22;
+constexpr int16_t ROW_H = 26;
 constexpr int16_t DISCLAIMER_Y = 236;
-constexpr int16_t DISCLAIMER_H = 52;
+constexpr int16_t DISCLAIMER_H = 56;
 constexpr int16_t DISCLAIMER_LINE1_Y = 244;
-constexpr int16_t DISCLAIMER_LINE2_Y = 264;
+constexpr int16_t DISCLAIMER_LINE2_Y = 266;
 constexpr int16_t DISCLAIMER_LINE_H = 18;
 } // namespace about
 

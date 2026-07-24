@@ -52,6 +52,7 @@ private:
     void build(const char* title, bool withBack);
 
     touchgfx::Box bar;
+    touchgfx::Box accentLine;
     touchgfx::TextAreaWithOneWildcard titleText;
     touchgfx::Unicode::UnicodeChar titleBuffer[TITLE_CAPACITY + 1U];
     TextButton backButton;

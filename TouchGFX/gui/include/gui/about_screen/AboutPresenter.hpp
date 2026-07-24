@@ -1,14 +1,7 @@
 #ifndef ABOUTPRESENTER_HPP
 #define ABOUTPRESENTER_HPP
 
-/**
- * @file    AboutPresenter.hpp
- * @brief   Presenter for the about / system information screen.
- * @note    Owner: user (non-generated).
- */
-
 #include <gui/model/ModelListener.hpp>
-#include <gui/common/IGuiDataProvider.hpp>
 #include <mvp/Presenter.hpp>
 
 using namespace touchgfx;
@@ -20,13 +13,19 @@ class AboutPresenter : public touchgfx::Presenter, public ModelListener
 public:
     AboutPresenter(AboutView& v);
 
+    /**
+     * The activate function is called automatically when this screen is "switched in"
+     * (ie. made active). Initialization logic can be placed here.
+     */
     virtual void activate();
+
+    /**
+     * The deactivate function is called automatically when this screen is "switched out"
+     * (ie. made inactive). Teardown functionality can be placed here.
+     */
     virtual void deactivate();
 
     virtual ~AboutPresenter() {}
-
-    /** @brief Read-access to the active data provider. */
-    gui::IGuiDataProvider& data() { return model->data(); }
 
 private:
     AboutPresenter();

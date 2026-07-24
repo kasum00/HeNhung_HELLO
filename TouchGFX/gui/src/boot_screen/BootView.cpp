@@ -53,9 +53,16 @@ void BootView::setupScreen()
     background.setColor(theme::background());
     add(background);
 
-    /* Simple logo mark: a filled accent square. */
-    logo.setPosition(static_cast<int16_t>((SCREEN_WIDTH - layout::boot::LOGO_SIZE) / 2),
-                     layout::boot::LOGO_Y, layout::boot::LOGO_SIZE, layout::boot::LOGO_SIZE);
+    /* Layered logo: shadow behind main square for depth. */
+    const int16_t logoX = static_cast<int16_t>((SCREEN_WIDTH - layout::boot::LOGO_SIZE) / 2);
+    logoShadow.setPosition(static_cast<int16_t>(logoX + 4),
+                           static_cast<int16_t>(layout::boot::LOGO_Y + 4),
+                           layout::boot::LOGO_SIZE, layout::boot::LOGO_SIZE);
+    logoShadow.setColor(theme::primaryDark());
+    add(logoShadow);
+
+    logo.setPosition(logoX, layout::boot::LOGO_Y,
+                     layout::boot::LOGO_SIZE, layout::boot::LOGO_SIZE);
     logo.setColor(theme::primary());
     add(logo);
 

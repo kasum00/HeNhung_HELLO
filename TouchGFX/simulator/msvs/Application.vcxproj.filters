@@ -306,15 +306,6 @@
     <ClCompile Include="..\..\generated\simulator\src\video\SoftwareMJPEGDecoder.cpp">
       <Filter>Source Files\generated\simulator\video</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gui\src\about_screen\AboutPresenter.cpp">
-      <Filter>Source Files\gui\about_screen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gui\src\about_screen\AboutView.cpp">
-      <Filter>Source Files\gui\about_screen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\generated\gui_generated\src\about_screen\AboutViewBase.cpp">
-      <Filter>Source Files\generated\gui_generated\about_screen</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\gui\src\boot_screen\BootPresenter.cpp">
       <Filter>Source Files\gui\boot_screen</Filter>
     </ClCompile>
@@ -381,15 +372,6 @@
     <ClCompile Include="..\..\gui\src\widgets\PlaceholderContent.cpp">
       <Filter>Source Files\gui\widgets</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gui\src\settings_screen\SettingsPresenter.cpp">
-      <Filter>Source Files\gui\settings_screen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gui\src\settings_screen\SettingsView.cpp">
-      <Filter>Source Files\gui\settings_screen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\generated\gui_generated\src\settings_screen\SettingsViewBase.cpp">
-      <Filter>Source Files\generated\gui_generated\settings_screen</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\gui\src\widgets\StatusBadge.cpp">
       <Filter>Source Files\gui\widgets</Filter>
     </ClCompile>
@@ -407,6 +389,24 @@
     </ClCompile>
     <ClCompile Include="..\..\generated\gui_generated\src\waveform_screen\WaveformViewBase.cpp">
       <Filter>Source Files\generated\gui_generated\waveform_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\about_screen\AboutPresenter.cpp">
+      <Filter>Source Files\gui\about_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\about_screen\AboutView.cpp">
+      <Filter>Source Files\gui\about_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\generated\gui_generated\src\about_screen\AboutViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\about_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\settings_screen\SettingsPresenter.cpp">
+      <Filter>Source Files\gui\settings_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\settings_screen\SettingsView.cpp">
+      <Filter>Source Files\gui\settings_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\generated\gui_generated\src\settings_screen\SettingsViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\settings_screen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -850,15 +850,6 @@
     <ClInclude Include="..\..\generated\simulator\include\simulator\video\SoftwareMJPEGDecoder.hpp">
       <Filter>Header Files\generated\simulator\include\simulator\video</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\about_screen\AboutPresenter.hpp">
-      <Filter>Header Files\gui\about_screen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\about_screen\AboutView.hpp">
-      <Filter>Header Files\gui\about_screen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\about_screen\AboutViewBase.hpp">
-      <Filter>Header Files\generated\gui_generated\about_screen</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\gui\include\gui\boot_screen\BootPresenter.hpp">
       <Filter>Header Files\gui\boot_screen</Filter>
     </ClInclude>
@@ -949,15 +940,6 @@
     <ClInclude Include="..\..\gui\include\gui\common\ScreenId.hpp">
       <Filter>Header Files\gui\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\settings_screen\SettingsPresenter.hpp">
-      <Filter>Header Files\gui\settings_screen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\settings_screen\SettingsView.hpp">
-      <Filter>Header Files\gui\settings_screen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\settings_screen\SettingsViewBase.hpp">
-      <Filter>Header Files\generated\gui_generated\settings_screen</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\gui\include\gui\widgets\StatusBadge.hpp">
       <Filter>Header Files\gui\widgets</Filter>
     </ClInclude>
@@ -975,6 +957,24 @@
     </ClInclude>
     <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\waveform_screen\WaveformViewBase.hpp">
       <Filter>Header Files\generated\gui_generated\waveform_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\about_screen\AboutPresenter.hpp">
+      <Filter>Header Files\gui\about_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\about_screen\AboutView.hpp">
+      <Filter>Header Files\gui\about_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\about_screen\AboutViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\about_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\settings_screen\SettingsPresenter.hpp">
+      <Filter>Header Files\gui\settings_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\settings_screen\SettingsView.hpp">
+      <Filter>Header Files\gui\settings_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\settings_screen\SettingsViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\settings_screen</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -60,16 +60,22 @@ void DashboardView::setupScreen()
     background.setColor(theme::background());
     add(background);
 
+    topBar.setup("Dashboard", ScreenId::Home);
+    add(topBar);
+
     namespace L = layout::dashboard;
     stateBadge.setup(layout::MARGIN, L::BADGE_Y, layout::CONTENT_W, L::BADGE_H);
     add(stateBadge);
 
-    /* Three uniform-height metric cards in one row. */
+    /* Three metric cards with distinct accent colours. */
     bpmCard.setup(L::CARD1_X, L::CARD_Y, L::CARD_W, L::CARD_H, "BPM", "bpm");
+    bpmCard.setAccentColor(theme::primary());
     add(bpmCard);
     spo2Card.setup(L::CARD2_X, L::CARD_Y, L::CARD_W, L::CARD_H, "SpO2", "%");
+    spo2Card.setAccentColor(theme::ok());
     add(spo2Card);
     sqiCard.setup(L::CARD3_X, L::CARD_Y, L::CARD_W, L::CARD_H, "SQI", "%");
+    sqiCard.setAccentColor(theme::warning());
     add(sqiCard);
 
     reasonText.setPosition(layout::MARGIN, L::REASON_Y, layout::CONTENT_W, L::REASON_H);
@@ -95,9 +101,6 @@ void DashboardView::setupScreen()
     waveformButton.setLabel("Waveform");
     waveformButton.setAction(waveformClicked);
     add(waveformButton);
-
-    topBar.setup("Dashboard", ScreenId::Home);
-    add(topBar);
 
     tickCounter = 0U;
     refresh();

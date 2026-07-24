@@ -1,15 +1,7 @@
 #ifndef SETTINGSPRESENTER_HPP
 #define SETTINGSPRESENTER_HPP
 
-/**
- * @file    SettingsPresenter.hpp
- * @brief   Presenter for the settings screen.
- * @note    Owner: user (non-generated).
- */
-
 #include <gui/model/ModelListener.hpp>
-#include <gui/common/IGuiDataProvider.hpp>
-#include <gui/common/GuiCommands.hpp>
 #include <mvp/Presenter.hpp>
 
 using namespace touchgfx;
@@ -21,16 +13,19 @@ class SettingsPresenter : public touchgfx::Presenter, public ModelListener
 public:
     SettingsPresenter(SettingsView& v);
 
+    /**
+     * The activate function is called automatically when this screen is "switched in"
+     * (ie. made active). Initialization logic can be placed here.
+     */
     virtual void activate();
+
+    /**
+     * The deactivate function is called automatically when this screen is "switched out"
+     * (ie. made inactive). Teardown functionality can be placed here.
+     */
     virtual void deactivate();
 
     virtual ~SettingsPresenter() {}
-
-    /** @brief Read-access to the active data provider. */
-    gui::IGuiDataProvider& data() { return model->data(); }
-
-    /** @brief Forwards a user command to the data provider. */
-    void postCommand(const gui::GuiCommand& command) { model->postCommand(command); }
 
 private:
     SettingsPresenter();

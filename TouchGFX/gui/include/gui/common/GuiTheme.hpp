@@ -31,6 +31,11 @@ inline touchgfx::colortype statusBar()    { return touchgfx::Color::getColorFrom
 /* Brand / accents. */
 inline touchgfx::colortype primary()      { return touchgfx::Color::getColorFromRGB(48, 122, 232); }
 inline touchgfx::colortype primaryDark()  { return touchgfx::Color::getColorFromRGB(32, 88, 176); }
+inline touchgfx::colortype primaryGlow()  { return touchgfx::Color::getColorFromRGB(64, 148, 255); }
+
+/* UI decorators. */
+inline touchgfx::colortype accentLine()   { return touchgfx::Color::getColorFromRGB(55, 64, 82); }
+inline touchgfx::colortype cardHover()    { return touchgfx::Color::getColorFromRGB(38, 42, 54); }
 
 /* Semantic states (paired with text/icons, never colour-only). */
 inline touchgfx::colortype ok()           { return touchgfx::Color::getColorFromRGB(52, 184, 108); }

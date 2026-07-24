@@ -32,6 +32,7 @@ protected:
 
     touchgfx::Box background;
     touchgfx::Box logo;
+    touchgfx::Box logoShadow;
     touchgfx::TextAreaWithOneWildcard titleText;
     touchgfx::TextAreaWithOneWildcard versionText;
     touchgfx::TextAreaWithOneWildcard statusText;

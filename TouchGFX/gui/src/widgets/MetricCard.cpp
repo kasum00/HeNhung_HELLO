@@ -29,6 +29,11 @@ void MetricCard::setup(int16_t x, int16_t y, int16_t width, int16_t height,
     background.setColor(theme::surface());
     add(background);
 
+    /* Coloured accent strip on top of the card. */
+    accentLine.setPosition(0, 0, width, layout::widget::CARD_ACCENT_H);
+    accentLine.setColor(theme::primary());
+    add(accentLine);
+
     captionText.setPosition(0, layout::widget::CARD_CAPTION_Y, width, layout::widget::CARD_CAPTION_H);
     captionText.setColor(theme::textSecondary());
     captionText.setTypedText(TypedText(T_WCSMALLCENTER));
@@ -52,6 +57,12 @@ void MetricCard::setup(int16_t x, int16_t y, int16_t width, int16_t height,
     unitBuffer[5] = 0;
     unitText.setWildcard1(unitBuffer);
     add(unitText);
+}
+
+void MetricCard::setAccentColor(colortype color)
+{
+    accentLine.setColor(color);
+    accentLine.invalidate();
 }
 
 void MetricCard::setValue(int32_t value, bool valid)

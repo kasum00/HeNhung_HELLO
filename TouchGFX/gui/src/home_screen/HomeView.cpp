@@ -20,15 +20,14 @@ struct MenuItem
 {
     const char* label;
     ScreenId target;
+    colortype accent;
 };
 
 const MenuItem MENU_ITEMS[HomeView::MENU_COUNT] = {
-    { "Measure",     ScreenId::Dashboard },
-    { "Waveform",    ScreenId::Waveform },
-    { "History",     ScreenId::History },
-    { "Settings",    ScreenId::Settings },
-    { "About",       ScreenId::About },
-    { "Clock",       ScreenId::DateTimeSettings }
+    { "Measure",     ScreenId::Dashboard,       theme::primary() },
+    { "Waveform",    ScreenId::Waveform,        theme::waveIr() },
+    { "History",     ScreenId::History,         theme::ok() },
+    { "Clock",       ScreenId::DateTimeSettings, theme::primaryGlow() }
 };
 
 /* Two-column button grid below the status bar (see GuiLayout::home). */
@@ -80,6 +79,11 @@ void HomeView::setupScreen()
         const int16_t row = static_cast<int16_t>(i / 2U);
         const int16_t x = static_cast<int16_t>(GRID_LEFT + col * (BTN_W + COL_GAP));
         const int16_t y = static_cast<int16_t>(GRID_TOP + row * (BTN_H + ROW_GAP));
+
+        /* Left accent strip for visual hierarchy. */
+        menuAccents[i].setPosition(x, y, 3, BTN_H);
+        menuAccents[i].setColor(MENU_ITEMS[i].accent);
+        add(menuAccents[i]);
 
         menuButtons[i].setup(x, y, BTN_W, BTN_H);
         menuButtons[i].setColors(theme::surface(), theme::primaryDark(), theme::textPrimary());

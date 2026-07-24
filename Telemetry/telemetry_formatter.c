@@ -38,9 +38,7 @@ static const char* screenStr(ApplicationScreen s)
         case APP_SCREEN_DASHBOARD:         return "DASHBOARD";
         case APP_SCREEN_WAVEFORM:          return "WAVEFORM";
         case APP_SCREEN_HISTORY:           return "HISTORY";
-        case APP_SCREEN_SETTINGS:          return "SETTINGS";
         case APP_SCREEN_DATETIME_SETTINGS: return "DATETIME_SETTINGS";
-        case APP_SCREEN_ABOUT:             return "ABOUT";
         default:                           return "UNKNOWN";
     }
 }
