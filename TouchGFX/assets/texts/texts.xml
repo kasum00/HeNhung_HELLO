@@ -37,15 +37,6 @@
       </Text>
     </TextGroup>
   </Texts>
-  <!--
-    TEXT SIZE = the "Size" attribute below. Change it and regenerate to resize
-    all text of that role (delete generated/texts and generated/fonts first).
-      Large   (40) : big metric values (BPM / SpO2 / SQI)
-      Default (20) : titles, badges, primary labels, buttons
-      Medium  (14) : data rows (InfoRow), settings, dense text
-      Small   (10) : captions, status bar, secondary info
-    Widget POSITIONS/SIZES live in gui/common/GuiLayout.hpp, not here.
-  -->
   <Typographies>
     <Typography Id="Default" Font="verdana.ttf" Size="20" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0x20-0x7E" />
     <Typography Id="Large" Font="verdana.ttf" Size="40" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0x20-0x7E" />

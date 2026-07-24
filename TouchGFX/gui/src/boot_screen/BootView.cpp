@@ -69,7 +69,7 @@ void BootView::setupScreen()
     versionText.setPosition(0, layout::boot::VERSION_Y, SCREEN_WIDTH, layout::boot::VERSION_H);
     versionText.setColor(theme::textSecondary());
     versionText.setTypedText(TypedText(T_WCSMALLCENTER));
-    Unicode::strncpy(versionBuffer, "Firmware nam chan be du", 24);
+    Unicode::strncpy(versionBuffer, "Firmware v1.0.0", 24);
     versionText.setWildcard1(versionBuffer);
     add(versionText);
 

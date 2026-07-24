@@ -181,8 +181,20 @@ void DashboardView::refresh()
         else { (void)snprintf(bpmStr, sizeof(bpmStr), "--"); }
         if (m.averageSpo2Valid) { (void)snprintf(spo2Str, sizeof(spo2Str), "%d", static_cast<int>(roundTo(m.averageSpo2))); }
         else { (void)snprintf(spo2Str, sizeof(spo2Str), "--"); }
-        (void)snprintf(line, sizeof(line), "Avg %s bpm  SpO2 %s%%  n%u",
-                       bpmStr, spo2Str, static_cast<unsigned>(m.validPeakCount));
+        /* Hiển thị min-max khi có kết quả chốt, avg khi đang đo. */
+        if (result && m.averageBpmValid)
+        {
+            (void)snprintf(line, sizeof(line), "%d-%d bpm  SpO2 %d-%d%%",
+                           static_cast<int>(roundTo(m.bpmMin)),
+                           static_cast<int>(roundTo(m.bpmMax)),
+                           static_cast<int>(roundTo(m.spo2Min)),
+                           static_cast<int>(roundTo(m.spo2Max)));
+        }
+        else
+        {
+            (void)snprintf(line, sizeof(line), "Avg %s bpm  SpO2 %s%%  n%u",
+                           bpmStr, spo2Str, static_cast<unsigned>(m.validPeakCount));
+        }
         Unicode::strncpy(infoBuffer, line, 36);
     }
     else
