@@ -74,20 +74,6 @@ public:
      * @return True when @p snapshot is meaningful (including Empty/error states).
      */
     virtual bool getHistoryPage(uint16_t pageIndex, GuiHistoryPageSnapshot& snapshot) = 0;
-
-    /**
-     * @brief Fills the current configuration (active + draft) snapshot.
-     * @param[out] snapshot Destination struct.
-     * @return True when @p snapshot is meaningful.
-     */
-    virtual bool getConfigurationSnapshot(GuiConfigurationSnapshot& snapshot) = 0;
-
-    /**
-     * @brief Fills static system/hardware information.
-     * @param[out] snapshot Destination struct.
-     * @return True when @p snapshot is meaningful.
-     */
-    virtual bool getSystemInfoSnapshot(GuiSystemInfoSnapshot& snapshot) = 0;
 };
 
 } // namespace gui

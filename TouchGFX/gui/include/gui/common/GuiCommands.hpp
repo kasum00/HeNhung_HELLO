@@ -29,14 +29,6 @@ enum class GuiCommandType : uint8_t
     StopMeasurement,
     SelectFilter,            /**< payload.filterMode                */
     SetFilterWindow,         /**< payload.filterWindow              */
-    SetMinimumSqi,           /**< payload.minimumSqiPercent         */
-    SetLoggingEnabled,       /**< payload.flag                      */
-    SetBuzzerEnabled,        /**< payload.flag                      */
-    SetAdaptiveLedEnabled,   /**< payload.flag                      */
-    SetBrightness,           /**< payload.brightnessPercent         */
-    ApplySettings,
-    CancelSettings,
-    RestoreDefaults,
     SelectScenario,          /**< payload.scenario (test control)   */
     SetDateTime              /**< payload date/time fields          */
 };
@@ -117,46 +109,6 @@ inline GuiCommand makeSelectScenario(MockScenario scenario)
     GuiCommand c{};
     c.type = GuiCommandType::SelectScenario;
     c.scenario = scenario;
-    return c;
-}
-
-/**
- * @brief Builds a flag-valued command (logging/buzzer/adaptive LED).
- * @param type  One of the Set*Enabled command types.
- * @param value Desired boolean value.
- * @return The command.
- */
-inline GuiCommand makeFlagCommand(GuiCommandType type, bool value)
-{
-    GuiCommand c{};
-    c.type = type;
-    c.flag = value;
-    return c;
-}
-
-/**
- * @brief Builds a "set minimum SQI" command.
- * @param percent Threshold in [0, 100].
- * @return The command.
- */
-inline GuiCommand makeSetMinimumSqi(uint8_t percent)
-{
-    GuiCommand c{};
-    c.type = GuiCommandType::SetMinimumSqi;
-    c.minimumSqiPercent = percent;
-    return c;
-}
-
-/**
- * @brief Builds a "set brightness" command.
- * @param percent Backlight level in [0, 100].
- * @return The command.
- */
-inline GuiCommand makeSetBrightness(uint8_t percent)
-{
-    GuiCommand c{};
-    c.type = GuiCommandType::SetBrightness;
-    c.brightnessPercent = percent;
     return c;
 }
 

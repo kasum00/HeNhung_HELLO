@@ -26,8 +26,6 @@ const MenuItem MENU_ITEMS[HomeView::MENU_COUNT] = {
     { "Measure",     ScreenId::Dashboard },
     { "Waveform",    ScreenId::Waveform },
     { "History",     ScreenId::History },
-    { "Settings",    ScreenId::Settings },
-    { "About",       ScreenId::About },
     { "Clock",       ScreenId::DateTimeSettings }
 };
 

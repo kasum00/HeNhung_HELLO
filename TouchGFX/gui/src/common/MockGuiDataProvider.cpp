@@ -19,23 +19,6 @@ constexpr uint32_t T_WAIT_FINGER = 1U;
 constexpr uint32_t T_STABILIZING = 3U;
 constexpr uint32_t T_MEASURING   = 5U;
 
-/* Configuration defaults. */
-constexpr uint8_t DEFAULT_MIN_SQI = 45U;
-constexpr uint8_t DEFAULT_BRIGHTNESS = 80U;
-
-GuiConfigurationSnapshot makeDefaultConfig()
-{
-    GuiConfigurationSnapshot c{};
-    c.generation = 0U;
-    c.filterMode = FilterMode::MovingAverage;
-    c.minimumSqiPercent = DEFAULT_MIN_SQI;
-    c.loggingEnabled = true;
-    c.buzzerEnabled = true;
-    c.adaptiveLedEnabled = true;
-    c.brightnessPercent = DEFAULT_BRIGHTNESS;
-    c.dirty = false;
-    return c;
-}
 } // namespace
 
 MockGuiDataProvider::MockGuiDataProvider()
@@ -47,9 +30,7 @@ MockGuiDataProvider::MockGuiDataProvider()
       measureStartSecond(0U),
       measurementState(MeasurementState::Idle),
       measurementReason(MeasurementInvalidReason::None),
-      resultStale(false),
-      activeConfig(makeDefaultConfig()),
-      draftConfig(makeDefaultConfig())
+      resultStale(false)
 {
 }
 
@@ -161,16 +142,6 @@ void MockGuiDataProvider::resolveMeasurementState()
     }
 }
 
-bool MockGuiDataProvider::draftDiffersFromActive() const
-{
-    return (draftConfig.filterMode != activeConfig.filterMode) ||
-           (draftConfig.minimumSqiPercent != activeConfig.minimumSqiPercent) ||
-           (draftConfig.loggingEnabled != activeConfig.loggingEnabled) ||
-           (draftConfig.buzzerEnabled != activeConfig.buzzerEnabled) ||
-           (draftConfig.adaptiveLedEnabled != activeConfig.adaptiveLedEnabled) ||
-           (draftConfig.brightnessPercent != activeConfig.brightnessPercent);
-}
-
 void MockGuiDataProvider::postCommand(const GuiCommand& command)
 {
     switch (command.type)
@@ -190,37 +161,10 @@ void MockGuiDataProvider::postCommand(const GuiCommand& command)
         break;
 
     case GuiCommandType::SelectFilter:
-        draftConfig.filterMode = command.filterMode;
         measFilterMode = command.filterMode;   /* waveform toggle: immediate */
         break;
     case GuiCommandType::SetFilterWindow:
         measWindow = command.filterWindow;
-        break;
-    case GuiCommandType::SetMinimumSqi:
-        draftConfig.minimumSqiPercent = command.minimumSqiPercent;
-        break;
-    case GuiCommandType::SetLoggingEnabled:
-        draftConfig.loggingEnabled = command.flag;
-        break;
-    case GuiCommandType::SetBuzzerEnabled:
-        draftConfig.buzzerEnabled = command.flag;
-        break;
-    case GuiCommandType::SetAdaptiveLedEnabled:
-        draftConfig.adaptiveLedEnabled = command.flag;
-        break;
-    case GuiCommandType::SetBrightness:
-        draftConfig.brightnessPercent = command.brightnessPercent;
-        break;
-    case GuiCommandType::ApplySettings:
-        activeConfig = draftConfig;
-        activeConfig.dirty = false;
-        draftConfig.dirty = false;
-        break;
-    case GuiCommandType::CancelSettings:
-        draftConfig = activeConfig;
-        break;
-    case GuiCommandType::RestoreDefaults:
-        draftConfig = makeDefaultConfig();
         break;
 
     case GuiCommandType::SetDateTime:
@@ -310,26 +254,6 @@ bool MockGuiDataProvider::getWaveformSnapshot(GuiWaveformSnapshot& snapshot)
 bool MockGuiDataProvider::getHistoryPage(uint16_t pageIndex, GuiHistoryPageSnapshot& snapshot)
 {
     return history.getPage(pageIndex, snapshot, generationCounter++);
-}
-
-bool MockGuiDataProvider::getConfigurationSnapshot(GuiConfigurationSnapshot& snapshot)
-{
-    snapshot = draftConfig;
-    snapshot.generation = generationCounter++;
-    snapshot.dirty = draftDiffersFromActive();
-    return true;
-}
-
-bool MockGuiDataProvider::getSystemInfoSnapshot(GuiSystemInfoSnapshot& snapshot)
-{
-    snapshot.projectName = "PPG Signal Analyzer";
-    snapshot.firmwareVersion = "v1.0.0";
-    snapshot.buildProfile = "Prototype";
-    snapshot.mcu = "STM32F429ZIT6";
-    snapshot.displayResolution = "240 x 320";
-    snapshot.sensorName = "MAX30102";
-    snapshot.algorithmStatus = "Simulated";
-    return true;
 }
 
 } // namespace gui

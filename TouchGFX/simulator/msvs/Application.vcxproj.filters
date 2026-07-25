@@ -196,14 +196,8 @@
     <Filter Include="Header Files\gui\waveform_screen">
       <UniqueIdentifier>12DB8C94-9601-57FD-07BC-5D184CEE30E5</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\gui\settings_screen">
-      <UniqueIdentifier>3A931396-2CE3-6B76-2E45-40EAB24BC987</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\gui\datetimesettings_screen">
       <UniqueIdentifier>A2DC4110-A3A9-B28E-D7A0-08EED47FE772</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\gui\settings_screen">
-      <UniqueIdentifier>5A654628-592E-5C6C-06DE-B0D3D524AF1D</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\gui\datetimesettings_screen">
       <UniqueIdentifier>AC9C220A-94B2-A9B8-3C56-CC3F0AAEB8D8</UniqueIdentifier>
@@ -219,24 +213,6 @@
     </Filter>
     <Filter Include="Source Files\gui\boot_screen">
       <UniqueIdentifier>A064361C-F8BF-2EE0-04C6-99484B444B17</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\gui\about_screen">
-      <UniqueIdentifier>A7DDF64F-EB44-2A84-2F5B-63A27CCC9D00</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\gui\about_screen">
-      <UniqueIdentifier>404D10B7-0DAA-5CB7-A96F-A0B3DF79D8AF</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\generated\gui_generated\about_screen">
-      <UniqueIdentifier>B2899D32-5679-552D-6C0E-177334B502D6</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\generated\gui_generated\settings_screen">
-      <UniqueIdentifier>57A43E21-9ED7-C858-5C25-8F33CB66F71B</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\generated\gui_generated\settings_screen">
-      <UniqueIdentifier>F9115C17-CB27-7DF2-55D6-82750F0B864C</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\generated\gui_generated\about_screen">
-      <UniqueIdentifier>3F5BA64C-DAF7-CE2C-7F2E-B78BA6EBE2EC</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\generated\gui_generated\boot_screen">
       <UniqueIdentifier>B7896423-D2F3-36D3-F410-8CC9A98ADBEA</UniqueIdentifier>
@@ -306,15 +282,6 @@
     <ClCompile Include="..\..\generated\simulator\src\video\SoftwareMJPEGDecoder.cpp">
       <Filter>Source Files\generated\simulator\video</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\gui\src\about_screen\AboutPresenter.cpp">
-      <Filter>Source Files\gui\about_screen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gui\src\about_screen\AboutView.cpp">
-      <Filter>Source Files\gui\about_screen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\generated\gui_generated\src\about_screen\AboutViewBase.cpp">
-      <Filter>Source Files\generated\gui_generated\about_screen</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\gui\src\boot_screen\BootPresenter.cpp">
       <Filter>Source Files\gui\boot_screen</Filter>
     </ClCompile>
@@ -380,15 +347,6 @@
     </ClCompile>
     <ClCompile Include="..\..\gui\src\widgets\PlaceholderContent.cpp">
       <Filter>Source Files\gui\widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gui\src\settings_screen\SettingsPresenter.cpp">
-      <Filter>Source Files\gui\settings_screen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gui\src\settings_screen\SettingsView.cpp">
-      <Filter>Source Files\gui\settings_screen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\generated\gui_generated\src\settings_screen\SettingsViewBase.cpp">
-      <Filter>Source Files\generated\gui_generated\settings_screen</Filter>
     </ClCompile>
     <ClCompile Include="..\..\gui\src\widgets\StatusBadge.cpp">
       <Filter>Source Files\gui\widgets</Filter>
@@ -850,15 +808,6 @@
     <ClInclude Include="..\..\generated\simulator\include\simulator\video\SoftwareMJPEGDecoder.hpp">
       <Filter>Header Files\generated\simulator\include\simulator\video</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\about_screen\AboutPresenter.hpp">
-      <Filter>Header Files\gui\about_screen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\about_screen\AboutView.hpp">
-      <Filter>Header Files\gui\about_screen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\about_screen\AboutViewBase.hpp">
-      <Filter>Header Files\generated\gui_generated\about_screen</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\gui\include\gui\boot_screen\BootPresenter.hpp">
       <Filter>Header Files\gui\boot_screen</Filter>
     </ClInclude>
@@ -948,15 +897,6 @@
     </ClInclude>
     <ClInclude Include="..\..\gui\include\gui\common\ScreenId.hpp">
       <Filter>Header Files\gui\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\settings_screen\SettingsPresenter.hpp">
-      <Filter>Header Files\gui\settings_screen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\gui\include\gui\settings_screen\SettingsView.hpp">
-      <Filter>Header Files\gui\settings_screen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\settings_screen\SettingsViewBase.hpp">
-      <Filter>Header Files\generated\gui_generated\settings_screen</Filter>
     </ClInclude>
     <ClInclude Include="..\..\gui\include\gui\widgets\StatusBadge.hpp">
       <Filter>Header Files\gui\widgets</Filter>

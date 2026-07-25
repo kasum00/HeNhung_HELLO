@@ -21,9 +21,6 @@
     <ClCompile Include="..\..\generated\gui_generated\src\common\FrontendApplicationBase.cpp"/>
     <ClCompile Include="..\..\gui\src\model\Model.cpp"/>
     <ClCompile Include="..\..\generated\simulator\src\video\SoftwareMJPEGDecoder.cpp"/>
-    <ClCompile Include="..\..\gui\src\about_screen\AboutPresenter.cpp"/>
-    <ClCompile Include="..\..\gui\src\about_screen\AboutView.cpp"/>
-    <ClCompile Include="..\..\generated\gui_generated\src\about_screen\AboutViewBase.cpp"/>
     <ClCompile Include="..\..\gui\src\boot_screen\BootPresenter.cpp"/>
     <ClCompile Include="..\..\gui\src\boot_screen\BootView.cpp"/>
     <ClCompile Include="..\..\generated\gui_generated\src\boot_screen\BootViewBase.cpp"/>
@@ -46,9 +43,6 @@
     <ClCompile Include="..\..\gui\src\common\MockHistoryProvider.cpp"/>
     <ClCompile Include="..\..\gui\src\common\MockSignalGenerator.cpp"/>
     <ClCompile Include="..\..\gui\src\widgets\PlaceholderContent.cpp"/>
-    <ClCompile Include="..\..\gui\src\settings_screen\SettingsPresenter.cpp"/>
-    <ClCompile Include="..\..\gui\src\settings_screen\SettingsView.cpp"/>
-    <ClCompile Include="..\..\generated\gui_generated\src\settings_screen\SettingsViewBase.cpp"/>
     <ClCompile Include="..\..\gui\src\widgets\StatusBadge.cpp"/>
     <ClCompile Include="..\..\gui\src\widgets\TextButton.cpp"/>
     <ClCompile Include="..\..\gui\src\widgets\TopBar.cpp"/>
@@ -205,9 +199,6 @@
     <ClInclude Include="..\..\gui\include\gui\model\ModelListener.hpp"/>
     <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\common\SimConstants.hpp"/>
     <ClInclude Include="..\..\generated\simulator\include\simulator\video\SoftwareMJPEGDecoder.hpp"/>
-    <ClInclude Include="..\..\gui\include\gui\about_screen\AboutPresenter.hpp"/>
-    <ClInclude Include="..\..\gui\include\gui\about_screen\AboutView.hpp"/>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\about_screen\AboutViewBase.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\boot_screen\BootPresenter.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\boot_screen\BootView.hpp"/>
     <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\boot_screen\BootViewBase.hpp"/>
@@ -238,9 +229,6 @@
     <ClInclude Include="..\..\gui\include\gui\common\MockSignalGenerator.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\widgets\PlaceholderContent.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\common\ScreenId.hpp"/>
-    <ClInclude Include="..\..\gui\include\gui\settings_screen\SettingsPresenter.hpp"/>
-    <ClInclude Include="..\..\gui\include\gui\settings_screen\SettingsView.hpp"/>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\settings_screen\SettingsViewBase.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\widgets\StatusBadge.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\widgets\TextButton.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\widgets\TopBar.hpp"/>

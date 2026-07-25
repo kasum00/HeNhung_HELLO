@@ -35,8 +35,6 @@ public:
     bool getMeasurementSnapshot(GuiMeasurementSnapshot& snapshot) override;
     bool getWaveformSnapshot(GuiWaveformSnapshot& snapshot) override;
     bool getHistoryPage(uint16_t pageIndex, GuiHistoryPageSnapshot& snapshot) override;
-    bool getConfigurationSnapshot(GuiConfigurationSnapshot& snapshot) override;
-    bool getSystemInfoSnapshot(GuiSystemInfoSnapshot& snapshot) override;
 
 private:
     MockGuiDataProvider mock_;   /**< ủy quyền cho các màn hình chưa dùng dữ liệu thật */
@@ -44,11 +42,6 @@ private:
     uint32_t generation_;
     uint32_t resultReadyMs_;     /**< HAL_GetTick khi lần đầu thấy RESULT_READY */
     bool     wasResultReady_;    /**<prevState == RESULT_READY để detect cạnh lên */
-
-    /** Cấu hình thật (draft + active) cho Settings screen. */
-    GuiConfigurationSnapshot draftConfig_;
-    GuiConfigurationSnapshot activeConfig_;
-    bool draftDirty() const;
 };
 
 } // namespace gui

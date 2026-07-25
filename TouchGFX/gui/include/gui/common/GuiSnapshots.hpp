@@ -149,32 +149,6 @@ struct GuiHistoryPageSnapshot
     GuiHistoryRecord records[HISTORY_RECORDS_PER_PAGE]; /**< Page contents.    */
 };
 
-/** @brief Active + draft configuration for the settings screen. */
-struct GuiConfigurationSnapshot
-{
-    uint32_t generation;
-
-    FilterMode filterMode;
-    uint8_t minimumSqiPercent;        /**< 0..100 acceptance threshold.        */
-    bool loggingEnabled;
-    bool buzzerEnabled;
-    bool adaptiveLedEnabled;
-    uint8_t brightnessPercent;        /**< 0..100 backlight.                   */
-    bool dirty;                       /**< Draft differs from active config.   */
-};
-
-/** @brief Static project / hardware information for the about screen. */
-struct GuiSystemInfoSnapshot
-{
-    const char* projectName;
-    const char* firmwareVersion;
-    const char* buildProfile;
-    const char* mcu;
-    const char* displayResolution;
-    const char* sensorName;
-    const char* algorithmStatus;
-};
-
 } // namespace gui
 
 #endif // GUI_SNAPSHOTS_HPP

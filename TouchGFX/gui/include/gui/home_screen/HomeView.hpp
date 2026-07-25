@@ -23,7 +23,7 @@ class HomeView : public HomeViewBase
 {
 public:
     /** Number of shortcut buttons on the menu. */
-    static constexpr uint8_t MENU_COUNT = 6U;
+    static constexpr uint8_t MENU_COUNT = 4U;
 
     HomeView();
     virtual ~HomeView() {}
