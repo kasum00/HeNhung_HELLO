@@ -293,7 +293,7 @@ static void updateAlertsAndTelemetry(const PpgResult* r)
 
     /* CHỈ stream giá trị đo (waveform + vital) khi đang đo trực tiếp và tín hiệu
        ổn định. Trước ổn định (WAIT_FINGER / STABILIZING) hoặc khi mất ổn định
-       giữa chừng thì KHÔNG gửi RED/IR/BPM/SpO2 — chỉ event/state/alert (đã publish
+       giữa chừng thì KHÔNG gửi RED/IR/BPM/SpO2 chỉ event/state/alert (đã publish
        ở trên) vẫn đi qua. Mất ổn định làm state != MEASURING ở nhịp sau nên stream
        tự dừng, và event đổi trạng thái vẫn được gửi. */
     const bool streamAllowed = r->fingerPresent && r->signalStable &&

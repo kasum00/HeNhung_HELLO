@@ -56,6 +56,14 @@ BuzzerStatus Buzzer_PlayFrequency(uint16_t frequencyHz);
 BuzzerStatus Buzzer_Stop(void);
 
 /**
+ * @brief Dừng buzzer CHỈ khi đang phát ở chế độ lặp (@ref Buzzer_PlayMelodyRepeat).
+ *
+ * Dùng cho lớp cảnh báo: kết thúc giai điệu alert mà không hủy một giai điệu một
+ * lần (ví dụ âm báo hoàn tất phép đo) do module khác vừa khởi động.
+ */
+BuzzerStatus Buzzer_StopLoop(void);
+
+/**
  * @brief Bắt đầu phát một giai điệu (non-blocking).
  * @param notes     Con trỏ tới mảng nốt (phải sống lâu hơn lúc phát).
  * @param noteCount Số nốt.
@@ -64,6 +72,17 @@ BuzzerStatus Buzzer_Stop(void);
  * Caller phải gọi @ref Buzzer_Process định kỳ để tiến việc phát.
  */
 BuzzerStatus Buzzer_PlayMelody(const BuzzerNote* notes, size_t noteCount);
+
+/**
+ * @brief Như @ref Buzzer_PlayMelody nhưng LẶP LẠI từ đầu khi phát hết.
+ * @param notes     Con trỏ tới mảng nốt (phải sống lâu hơn lúc phát).
+ * @param noteCount Số nốt (0 -> không phát, trả INVALID_ARGUMENT).
+ * @return BUZZER_STATUS_OK nếu đã bắt đầu phát.
+ *
+ * Dùng cho giai điệu cảnh báo: tự lặp cho tới khi @ref Buzzer_Stop /
+ * @ref Buzzer_StopLoop. Caller phải gọi @ref Buzzer_Process định kỳ.
+ */
+BuzzerStatus Buzzer_PlayMelodyRepeat(const BuzzerNote* notes, size_t noteCount);
 
 /**
  * @brief Tiến việc phát giai điệu; gọi định kỳ (ví dụ mỗi 1-5 ms).

@@ -5,13 +5,7 @@
  * @file    application_gui_bridge.hpp
  * @brief   Nguồn dữ liệu GUI thật (target): đọc kết quả engine đo (đã công bố bởi
  *          DSP task) cùng RTC service, đọc lịch sử tạm, và ủy quyền các màn hình
- *          chưa dùng dữ liệu thật (settings/system-info) cho một
- *          MockGuiDataProvider nội bộ.
  *
- * Model chọn bridge này trên target (SIMULATOR dùng mock). Engine chạy trong DSP
- * task; tick() ở đây chỉ đọc kết quả đã công bố nên không cần khóa engine. Nằm
- * ngoài cây gui/ để bản build simulator không bao giờ biên dịch phần phụ thuộc
- * HAL/firmware này.
  */
 
 #include <gui/common/IGuiDataProvider.hpp>

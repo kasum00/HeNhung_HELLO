@@ -41,15 +41,6 @@ static const BuzzerNote BUZZER_MELODY_STARTUP[] =
 };
 #define BUZZER_MELODY_STARTUP_LEN  (sizeof(BUZZER_MELODY_STARTUP) / sizeof(BUZZER_MELODY_STARTUP[0]))
 
-/** @brief Self-test lúc bring-up: ba cao độ khác nhau rõ rệt. */
-static const BuzzerNote BUZZER_MELODY_SELFTEST[] =
-{
-    { NOTE_C4, 300U, 100U },
-    { NOTE_E4, 300U, 100U },
-    { NOTE_G4, 500U, 0U   }
-};
-#define BUZZER_MELODY_SELFTEST_LEN  (sizeof(BUZZER_MELODY_SELFTEST) / sizeof(BUZZER_MELODY_SELFTEST[0]))
-
 /** @brief Đo xong + đã lưu: giai điệu 2 nốt đi lên dễ chịu. */
 static const BuzzerNote BUZZER_MELODY_DONE[] =
 {
@@ -65,5 +56,17 @@ static const BuzzerNote BUZZER_MELODY_INVALID[] =
     { NOTE_C4, 90U, 0U  }
 };
 #define BUZZER_MELODY_INVALID_LEN  (sizeof(BUZZER_MELODY_INVALID) / sizeof(BUZZER_MELODY_INVALID[0]))
+
+/*
+ * Giai điệu CẢNH BÁO (BPM/SpO2 vượt ngưỡng). Lớp alert phát melody này ở chế độ
+ * LẶP suốt thời gian cảnh báo, đồng bộ với đèn PG13/PG14.
+ *
+ */
+static const BuzzerNote BUZZER_MELODY_ALERT[] =
+{
+	{ 950U, 300U, 20U },
+	{ 650U, 300U, 20U },
+};
+#define BUZZER_MELODY_ALERT_LEN  (sizeof(BUZZER_MELODY_ALERT) / sizeof(BUZZER_MELODY_ALERT[0]))
 
 #endif /* BUZZER_MELODIES_H */

@@ -15,6 +15,7 @@
 #include "physical_input_service.h"
 #include "medical_alert_service.h"
 #include "alert_led_pattern.h"
+#include "alert_buzzer.h"
 #include "telemetry_service.h"
 #include "cmsis_os2.h"
 
@@ -58,6 +59,7 @@ void App_Init(void)
     /* LED cảnh báo tắt hẳn lúc boot, mẫu nháy về trạng thái nghỉ. */
     StatusLed_Init();
     AlertLed_Init();
+    AlertBuzzer_Init();             /* còi cảnh báo, cùng vòng đời với đèn */
     MedicalAlert_Init(NULL);        /* NULL -> ngưỡng mặc định từ alert_config.h */
 
     /* Nút B1: chân + sườn do CubeMX cấu hình, hàm này bật NVIC EXTI0. */
@@ -103,9 +105,13 @@ void App_DefaultTask(void)
     {
         Buzzer_Process();
 
-        /* Mẫu nháy LED cảnh báo chạy Ở ĐÂY (không phải trong DspTask): thuật toán
-           BPM/SpO2 không được chạm GPIO. DspTask chỉ cập nhật cờ cảnh báo. */
-        AlertLed_Process(MedicalAlert_IsActive(), HAL_GetTick());
+        /* Đèn cảnh báo VÀ còi cảnh báo chạy Ở ĐÂY (không phải trong DspTask):
+           thuật toán BPM/SpO2 không được chạm GPIO/buzzer. Cả hai đọc CÙNG một cờ
+           MedicalAlert_IsActive() lấy một lần, nên chung một vòng đời cảnh báo —
+           cùng bắt đầu, cùng dừng. */
+        const bool alertActive = MedicalAlert_IsActive();
+        AlertLed_Process(alertActive, HAL_GetTick());
+        AlertBuzzer_Process(alertActive);
 
         /* Poll FIFO MAX30102 và đưa RAW sample vào queue cho DSP task. */
         static Max30102Sample samples[16];
