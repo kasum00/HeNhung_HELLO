@@ -7,9 +7,7 @@
  *
  * Một store singleton chứa các bản tóm tắt phép đo gần nhất. Không cấp phát động:
  * một mảng cố định TEMP_HISTORY_CAPACITY bản ghi. Khi đầy, bản ghi cũ nhất bị ghi
- * đè và một bộ đếm overwrite được tăng. Lịch sử RAM này MẤT khi reset/mất nguồn;
- * giai đoạn sau sẽ thêm lưu trên SD phía sau @ref HistoryStorageInterface mà
- * không đổi caller.
+ * đè và một bộ đếm overwrite được tăng. Lịch sử RAM này MẤT khi reset/mất nguồn.
  *
  * GUI không bao giờ đụng mảng nội bộ — nó đọc bản sao qua các accessor này.
  *

@@ -291,22 +291,36 @@ static void updateAlertsAndTelemetry(const PpgResult* r)
     MedicalAlert_Update(&u);
     publishAlertChanges(r, (uint32_t)MedicalAlert_GetActiveFlags());
 
-    publishSample(r);
-
-    /* BPM/SpO2 tóm tắt ~1 Hz (không gửi kèm mỗi sample waveform, §31). */
-    if (++s_vitalDivider >= DSP_VITAL_PERIOD_TICKS)
+    /* CHỈ stream giá trị đo (waveform + vital) khi đang đo trực tiếp và tín hiệu
+       ổn định. Trước ổn định (WAIT_FINGER / STABILIZING) hoặc khi mất ổn định
+       giữa chừng thì KHÔNG gửi RED/IR/BPM/SpO2 — chỉ event/state/alert (đã publish
+       ở trên) vẫn đi qua. Mất ổn định làm state != MEASURING ở nhịp sau nên stream
+       tự dừng, và event đổi trạng thái vẫn được gửi. */
+    const bool streamAllowed = r->fingerPresent && r->signalStable &&
+                               (r->state == PPG_STATE_MEASURING);
+    if (streamAllowed)
     {
-        s_vitalDivider = 0U;
-        TelemetryVitalResult v;
-        v.bpm         = r->bpm;
-        v.averageBpm  = r->averageBpm;
-        v.spo2        = r->spo2;
-        v.averageSpo2 = r->averageSpo2;
-        v.sqi         = r->sqiPercent;
-        v.state       = r->state;
-        v.bpmValid    = r->bpmValid;
-        v.spo2Valid   = r->spo2Valid;
-        (void)Telemetry_PublishVitalResult(&v);
+        publishSample(r);
+
+        /* BPM/SpO2 tóm tắt ~1 Hz (không gửi kèm mỗi sample waveform, §31). */
+        if (++s_vitalDivider >= DSP_VITAL_PERIOD_TICKS)
+        {
+            s_vitalDivider = 0U;
+            TelemetryVitalResult v;
+            v.bpm         = r->bpm;
+            v.averageBpm  = r->averageBpm;
+            v.spo2        = r->spo2;
+            v.averageSpo2 = r->averageSpo2;
+            v.sqi         = r->sqiPercent;
+            v.state       = r->state;
+            v.bpmValid    = r->bpmValid;
+            v.spo2Valid   = r->spo2Valid;
+            (void)Telemetry_PublishVitalResult(&v);
+        }
+    }
+    else
+    {
+        s_vitalDivider = 0U;   /* reset nhịp vital để lần đo sau bắt đầu sạch */
     }
 }
 

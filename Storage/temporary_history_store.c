@@ -34,7 +34,6 @@ HistoryStatus TemporaryHistory_Add(MeasurementHistoryRecord* record)
     }
 
     record->recordId = s_store.nextRecordId++;
-    record->persistedToSd = false;   /* giai đoạn này chỉ ở RAM */
 
     s_store.records[s_store.writeIndex] = *record;
 
