@@ -171,7 +171,6 @@ bool ApplicationGuiBridge::getMeasurementSnapshot(GuiMeasurementSnapshot& snapsh
     snapshot.temporarilySaved = ppg_.resultSaved;
 
     snapshot.sensorStatus = (g_sensorOk != 0) ? SensorStatus::Ok : SensorStatus::Error;
-    snapshot.storageStatus = StorageStatus::Absent;   /* board này không có SD */
 
     snapshot.fingerPresent = ppg_.fingerPresent;
     snapshot.signalStable = ppg_.signalStable;

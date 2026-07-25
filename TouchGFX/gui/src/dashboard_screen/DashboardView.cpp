@@ -200,10 +200,8 @@ void DashboardView::refresh()
     else
     {
         Unicode::UnicodeChar sensorU[10];
-        Unicode::UnicodeChar storageU[10];
         Unicode::strncpy(sensorU, toText(m.sensorStatus), 10);
-        Unicode::strncpy(storageU, toText(m.storageStatus), 10);
-        Unicode::snprintf(infoBuffer, 36, "Sensor %s  SD %s", sensorU, storageU);
+        Unicode::snprintf(infoBuffer, 36, "Sensor %s", sensorU);
     }
     infoText.setWildcard1(infoBuffer);
     infoText.invalidate();
