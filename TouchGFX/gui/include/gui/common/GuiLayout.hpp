@@ -185,39 +185,6 @@ constexpr int16_t STATE_H = 20;
 } // namespace history
 
 
-/** @name Settings */
-namespace settings
-{
-constexpr int16_t ROW_TOP = 42;
-constexpr int16_t ROW_H = 32;
-constexpr int16_t LABEL_W = 112;
-constexpr int16_t VALUE_X = 128;
-constexpr int16_t VALUE_W = 104;
-constexpr int16_t VALUE_H = 26;
-constexpr int16_t STATUS_Y = 220;
-constexpr int16_t STATUS_H = 16;
-constexpr int16_t ACTION_Y = 240;
-constexpr int16_t ACTION_H = 38;
-constexpr int16_t ACTION_W = 72;
-constexpr int16_t APPLY_X = 8;
-constexpr int16_t CANCEL_X = 84;
-constexpr int16_t RESTORE_X = 160;
-} // namespace settings
-
-/** @name About */
-namespace about
-{
-constexpr int16_t TITLE_Y = 42;
-constexpr int16_t TITLE_H = 24;
-constexpr int16_t ROWS_TOP = 72;
-constexpr int16_t ROW_H = 26;
-constexpr int16_t DISCLAIMER_Y = 236;
-constexpr int16_t DISCLAIMER_H = 56;
-constexpr int16_t DISCLAIMER_LINE1_Y = 244;
-constexpr int16_t DISCLAIMER_LINE2_Y = 266;
-constexpr int16_t DISCLAIMER_LINE_H = 18;
-} // namespace about
-
 } // namespace layout
 } // namespace gui
 
