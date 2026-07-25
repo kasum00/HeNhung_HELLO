@@ -27,6 +27,7 @@ static size_t s_noteIndex = 0U;
 static MelodyPhase s_phase = PHASE_IDLE;
 static uint32_t s_phaseStartMs = 0U;
 static bool s_toneActive = false;
+static bool s_loop = false;      /**< Lặp lại giai điệu từ đầu khi phát hết.     */
 
 /* -------------------------------------------------------------------------- */
 /* Điều khiển PWM mức thấp                                                     */
@@ -140,11 +141,24 @@ BuzzerStatus Buzzer_Stop(void)
     s_phase = PHASE_IDLE;
     s_notes = NULL;
     s_noteCount = 0U;
+    s_loop = false;
     toneOff();
     return BUZZER_STATUS_OK;
 }
 
-BuzzerStatus Buzzer_PlayMelody(const BuzzerNote* notes, size_t noteCount)
+BuzzerStatus Buzzer_StopLoop(void)
+{
+    /* Chỉ dừng khi đang phát ở chế độ lặp; không đụng giai điệu một lần (ví dụ
+       âm báo hoàn tất) do module khác khởi động. */
+    if (s_initialized && s_loop)
+    {
+        return Buzzer_Stop();
+    }
+    return BUZZER_STATUS_OK;
+}
+
+/** Khởi động một giai điệu (một lần hoặc lặp). */
+static BuzzerStatus startMelody(const BuzzerNote* notes, size_t noteCount, bool loop)
 {
     if (!s_initialized)
     {
@@ -152,15 +166,26 @@ BuzzerStatus Buzzer_PlayMelody(const BuzzerNote* notes, size_t noteCount)
     }
     if ((notes == NULL) || (noteCount == 0U))
     {
-        return BUZZER_STATUS_INVALID_ARGUMENT;
+        return BUZZER_STATUS_INVALID_ARGUMENT;   /* melody rỗng: giữ nguyên trạng thái */
     }
 
     s_notes = notes;
     s_noteCount = noteCount;
     s_noteIndex = 0U;
+    s_loop = loop;
     s_phase = PHASE_TONE;
     s_phaseStartMs = HAL_GetTick();
     return toneOn(s_notes[0].frequencyHz);
+}
+
+BuzzerStatus Buzzer_PlayMelody(const BuzzerNote* notes, size_t noteCount)
+{
+    return startMelody(notes, noteCount, false);
+}
+
+BuzzerStatus Buzzer_PlayMelodyRepeat(const BuzzerNote* notes, size_t noteCount)
+{
+    return startMelody(notes, noteCount, true);
 }
 
 void Buzzer_Process(void)
@@ -197,12 +222,19 @@ void Buzzer_Process(void)
         }
     }
 
-    /* Tiến sang nốt kế tiếp (hoặc kết thúc). */
+    /* Tiến sang nốt kế tiếp (hoặc kết thúc / lặp lại). */
     ++s_noteIndex;
     if (s_noteIndex >= s_noteCount)
     {
-        (void)Buzzer_Stop();
-        return;
+        if (s_loop)
+        {
+            s_noteIndex = 0U;       /* phát lại từ đầu (alert còn hiệu lực) */
+        }
+        else
+        {
+            (void)Buzzer_Stop();
+            return;
+        }
     }
     s_phase = PHASE_TONE;
     s_phaseStartMs = now;
