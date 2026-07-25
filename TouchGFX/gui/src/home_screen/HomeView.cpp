@@ -118,10 +118,8 @@ void HomeView::updateStatus()
 
     /* %s expects a UnicodeChar list, so convert the ASCII status labels first. */
     Unicode::UnicodeChar sensorU[10];
-    Unicode::UnicodeChar storageU[10];
     Unicode::strncpy(sensorU, toText(m.sensorStatus), 10);
-    Unicode::strncpy(storageU, toText(m.storageStatus), 10);
-    Unicode::snprintf(statusBuffer, 28, "Sensor %s  SD %s", sensorU, storageU);
+    Unicode::snprintf(statusBuffer, 28, "Sensor %s", sensorU);
     statusText.setWildcard1(statusBuffer);
     statusText.invalidate();
 }

@@ -191,8 +191,6 @@ bool MockGuiDataProvider::getMeasurementSnapshot(GuiMeasurementSnapshot& snapsho
     const MockScenario sc = signal.scenario();
     snapshot.sensorStatus = (sc == MockScenario::SensorError) ? SensorStatus::Error
                                                               : SensorStatus::Ok;
-    snapshot.storageStatus = (sc == MockScenario::StorageError) ? StorageStatus::Error
-                                                                : StorageStatus::Ready;
 
     /* Synthetic values for the real-measurement fields so the GUI can be
        exercised in the simulator (the application bridge fills them for real). */
