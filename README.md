@@ -6,21 +6,38 @@
 
 ### Đề bài / Mục tiêu sản phẩm
 
-Thiết kế và hiện thực hóa hệ thống đo lường nhịp tim (BPM) và nồng độ oxy trong máu (SpO2) sử dụng cảm biến quang học PPG trên nền tảng vi điều khiển STM32F4, với giao diện đồ họa TouchGFX trên màn hình LCD 240x320 px.
+- Sử dụng STM32F429 và TouchGFX.
+- Liên tục lấy giá trị nhịp tim và SpO2. 
+- Hiển thị 2 thông số này lên màn hình ở với nhiều kiểu hiện thị. Bấm nút B1 để hoàn đổi giữa các kiểu hiên thị này:
+   - Màn hình 1: hiển thị giá trị real-time dạng số: 
+   - Màn hình 2: đồ thị line.
+- Luôn luôn truyền dữ liệu realtime qua USART về máy tính.
+- Ngưỡng cố định khi nhịp tim hoặc lượng SpO2 dưới ngưỡng y tế cho phép
+- Luôn luôn kiểm tra xem nhịp tim và O2 có vượt ngưỡng không. Nếu vượt thì nháy 2 đèn led PG13, PG14.
 
 ### Hướng tiếp cận
 
-Hệ thống sử dụng cảm biến quang học MAX30102 để thu tín hiệu PPG (Photoplethysmogram) từ ngón tay người dùng. Tín hiệu thô được xử lý bởi chuỗi lọc số (DSP) gồm nhiều bộ lọc: trung bình trượt, trung vị, và Butterworth bậc 2 bậc thấp. Kết quả BPM, SpO2 và chất lượng tín hiệu (SQI) được hiển thị trực tiếp lên màn hình LCD thông qua giao diện TouchGFX. Toát độ thời gian thực được đảm bảo bởi hệ điều hành FreeRTOS với 4 luồng chạy song song: thu thập cảm biến, xử lý tín hiệu, hiển thị GUI và truyền telemettry qua UART.
+Hệ thống sử dụng cảm biến quang học MAX30102 để thu tín hiệu PPG từ ngón tay người dùng. Dữ liệu RED và IR thô được truyền về vi điều khiển STM32 thông qua giao tiếp I2C, sau đó được đưa vào khối xử lý tín hiệu số DSP.
+
+Tại khối DSP, tín hiệu được loại bỏ thành phần DC và lọc nhiễu bằng các bộ lọc như trung bình trượt, trung vị và Butterworth thông thấp. Sau khi tín hiệu ổn định, hệ thống phát hiện các đỉnh PPG để tính nhịp tim BPM, đồng thời sử dụng thuật toán ratio-of-ratios để ước lượng SpO2. Chất lượng tín hiệu được đánh giá thông qua chỉ số SQI.
+
+Các kết quả BPM, SpO2, SQI và dạng sóng PPG được hiển thị trực tiếp trên màn hình LCD thông qua giao diện TouchGFX. Hệ điều hành FreeRTOS được sử dụng để chia hệ thống thành nhiều tác vụ chạy song song, gồm thu thập dữ liệu cảm biến, xử lý tín hiệu, cập nhật giao diện và truyền dữ liệu telemetry qua UART. Cách tổ chức này giúp hệ thống hoạt động ổn định và đáp ứng tốt yêu cầu thời gian thực.
 
 ### Sản phẩm
 
-1. **Đo nhịp tim (BPM):** Nhận diện đỉnh PPG, tính BPM trung vị từ 5 khoảng RR, phạm vi 40-200 BPM.
-2. **Đo nồng độ oxy máu (SpO2):** Thuật toán ratio-of-ratios với cửa sổ trượt 4 giây, phạm vi 70-100%.
-3. **Đánh giá chất lượng tín hiệu (SQI):** Chỉ số 0-100%, phân loại Poor/Fair/Good.
-4. **Hiển thị sóng PPG thời gian thực:** Vẽ đồ thị 240 điểm, chọn kênh IR/RED, 5 chế độ lọc.
-5. **Lịch sử đo:** Bộ nhớ RAM vòng 20 bản ghi với timestamp RTC.
-6. **Cảnh báo y tế:** BPM thấp/thấp, SpO2 thấp với cơ chế xác nhận theo thời gian.
-7. **Phản hồi âm thanh:** Buzzer PWM với giai điệu cho các trạng thái khác nhau.
+1. **Đo nhịp tim (BPM):** Hệ thống nhận diện các đỉnh trong tín hiệu PPG để tính khoảng RR, sau đó ước lượng nhịp tim trong phạm vi 40-200 BPM.
+
+2. **Đo nồng độ oxy trong máu (SpO2):** Sử dụng dữ liệu RED và IR từ cảm biến MAX30102, áp dụng thuật toán ratio-of-ratios trên cửa sổ trượt 4 giây để ước lượng SpO2 trong phạm vi 70-100%.
+
+3. **Đánh giá chất lượng tín hiệu (SQI):** Tính toán chỉ số chất lượng tín hiệu từ 0-100%, hỗ trợ phân loại mức tín hiệu thành Poor, Fair và Good để người dùng biết độ tin cậy của phép đo.
+
+4. **Hiển thị sóng PPG thời gian thực:** Giao diện hiển thị dạng sóng PPG với 240 điểm dữ liệu, cho phép quan sát tín hiệu trực tiếp, chọn kênh IR/RED và thay đổi chế độ lọc tín hiệu.
+
+5. **Lưu lịch sử đo:** Sau mỗi phiên đo hợp lệ, kết quả được lưu tạm thời trong bộ nhớ RAM dạng vòng, kèm thời gian đo lấy từ module RTC DS1307.
+
+6. **Cảnh báo y tế:** Hệ thống theo dõi các ngưỡng bất thường như BPM thấp, BPM cao hoặc SpO2 thấp. Cảnh báo chỉ được kích hoạt khi giá trị vượt ngưỡng trong một khoảng thời gian xác nhận nhằm tránh báo sai do nhiễu tín hiệu.
+
+7. **Phản hồi âm thanh:** Buzzer PWM phát các giai điệu khác nhau cho từng trạng thái như khởi động, đo hoàn tất, phép đo không hợp lệ hoặc cảnh báo bất thường.
 
 **Ảnh chụp minh họa:**
 
@@ -40,31 +57,58 @@ _Màn hình sóng PPG thời gian thực_
 
 ---
 
+## TÁC GIẢ
+
+- Tên nhóm:HELLO
+- Thành viên trong nhóm
+  |STT|Họ tên|MSSV|Công việc|
+  |--:|--|--|--|
+  |1|Vũ Thu Huyền|20235348|Hiển thị LCD, xây dựng giao diện, hiệu ứng chuyển màn hình, xử lý ngắt nút nhấn|
+  |2|Trần Tuấn Anh|20235266|Lập trình đọc cảm biến MAX30102, giao tiếp I2C, cấu hình FIFO, lấy dữ liệu RED/IR thô|
+  |3|Nguyễn Trần Gia Phụng|20235402|Xử lý tín hiệu PPG, lọc nhiễu, phát hiện đỉnh, tính BPM, SpO2 và SQI|
+  |4|Nguyễn Thị Tuyết Mai|20235369|Xây dựng luồng FreeRTOS, quản lý task, queue dữ liệu, đồng bộ I2C, xử lý RTC DS1307 và lưu lịch sử đo|
+  |5|Nguyễn Thanh Hương|20235343|Lập trình cảnh báo LED/buzzer, truyền telemetry UART, kiểm thử hệ thống, viết báo cáo và tổng hợp kết quả|
+
+
 ## MÔI TRƯỜNG HOẠT ĐỘNG
 
 ### Phần cứng
 
-- **Vi điều khiển:** STM32F429ZIT6 (ARM Cortex-M4, 180 MHz, LQFP144) trên board **STM32F429I-DISCO REV D01**
-- **RAM ngoài:** SDRAM qua FMC Bank 2 (16-bit bus) - dùng làm frame buffer cho TouchGFX
-- **Màn hình:** ILI9341 TFT LCD 240x320 px, RGB565, giao tiếp song song LTDC
-- **IDE:** STM32CubeIDE (chính), hỗ trợ IAR EWARM v8.50.9+ và Keil MDK-ARM
+- **Vi điều khiển:** Sử dụng STM32F429ZIT6 trên board STM32F429I-DISCO REV D01. Đây là vi điều khiển ARM Cortex-M4 chạy ở tần số tối đa 180 MHz, phù hợp cho các tác vụ xử lý tín hiệu, điều khiển ngoại vi và hiển thị giao diện đồ họa.
+
+- **Cảm biến MAX30102:** Cảm biến quang học dùng để thu tín hiệu PPG từ ngón tay người dùng. Cảm biến cung cấp dữ liệu hai kênh RED và IR, phục vụ cho việc tính nhịp tim BPM và nồng độ oxy trong máu SpO2.
+
+- **Module RTC DS1307:** Dùng để lưu và cung cấp thời gian thực cho hệ thống. Thời gian từ RTC được sử dụng để gắn timestamp cho các bản ghi lịch sử đo.
+
+- **RAM ngoài SDRAM:** SDRAM được kết nối qua FMC Bank 2 với bus dữ liệu 16-bit, dùng làm bộ nhớ đệm khung hình cho giao diện TouchGFX.
+
+- **Màn hình LCD:** Màn hình ILI9341 TFT LCD kích thước 240x320 px, định dạng màu RGB565, giao tiếp với vi điều khiển thông qua LTDC để hiển thị giao diện người dùng và dạng sóng PPG.
+
+- **Buzzer:** Buzzer thụ động được điều khiển bằng tín hiệu PWM, dùng để phát âm thanh phản hồi khi khởi động, đo xong, phép đo không hợp lệ hoặc có cảnh báo.
+
+- **LED cảnh báo:** Sử dụng các LED có sẵn trên board để hiển thị trạng thái cảnh báo khi nhịp tim hoặc SpO2 vượt ngưỡng cấu hình.
 
 ### Bill of Materials
 
-| STT | Tên linh kiện    | Ý nghĩa                                                   |
-| --: | ---------------- | --------------------------------------------------------- |
-|   1 | STM32F429I-DISCO | Board development kit chính, chứa MCU + LCD + SDRAM + LED |
-|   2 | MAX30102         | Cảm biến quang học PPG đo SpO2 và nhịp tim                |
-|   3 | DS1307           | Module RTC (Real-Time Clock) giữ giờ thực                 |
-|   4 | Buzzer thụ động  | Phản hồi âm thanh (cảnh báo, thông báo)                   |
-|   5 | Nguồn USB 5V     | Cung cấp điện cho board và cảm biến                       |
+| STT | Tên linh kiện | Ý nghĩa |
+| --: | -- | -- |
+| 1 | STM32F429I-DISCO | Board phát triển chính của hệ thống, tích hợp vi điều khiển STM32F429ZIT6, màn hình LCD, SDRAM và LED trạng thái. |
+| 2 | MAX30102 | Cảm biến quang học dùng để thu tín hiệu PPG từ ngón tay, phục vụ tính toán nhịp tim BPM và nồng độ oxy trong máu SpO2. |
+| 3 | DS1307 | Module đồng hồ thời gian thực, dùng để cung cấp thời gian cho hệ thống và gắn timestamp cho các bản ghi lịch sử đo. |
+| 4 | Buzzer thụ động | Thiết bị phát âm thanh phản hồi, dùng cho các trạng thái như khởi động, đo hoàn tất, phép đo không hợp lệ và cảnh báo. |
+| 5 | Nguồn USB 5V | Nguồn cấp chính cho board STM32F429I-DISCO và các module ngoại vi trong hệ thống. |
 
 ### Phần mềm
 
-- **Hệ điều hành:** FreeRTOS V10.0.1 (CMSIS-RTOS V2)
-- **GUI Framework:** TouchGFX (X-CUBE-TOUCHGFX 4.26.1)
-- **HAL:** STM32Cube FW_F4 V1.28.1
-- **Ngôn ngữ:** C (drivers, DSP, application) + C++ (TouchGFX GUI)
+- **Hệ điều hành:** FreeRTOS V10.0.1 sử dụng thông qua lớp CMSIS-RTOS V2. FreeRTOS giúp chia hệ thống thành nhiều tác vụ chạy song song như đọc cảm biến, xử lý tín hiệu, cập nhật giao diện và truyền dữ liệu UART.
+
+- **GUI Framework:** TouchGFX, thuộc gói X-CUBE-TOUCHGFX 4.26.1, được sử dụng để xây dựng giao diện đồ họa trên màn hình LCD. Giao diện gồm các màn hình như Home, Dashboard, Waveform, History và cài đặt thời gian.
+
+- **Thư viện HAL:** STM32Cube FW_F4 V1.28.1 cung cấp các hàm điều khiển ngoại vi của STM32 như GPIO, I2C, UART, LTDC, DMA2D, FMC và SPI.
+
+- **Ngôn ngữ lập trình:** Dự án sử dụng kết hợp C và C++. Các phần driver, xử lý tín hiệu DSP, task FreeRTOS và dịch vụ hệ thống được viết bằng C; phần giao diện TouchGFX và cầu nối dữ liệu GUI được viết bằng C++.
+
+- **Môi trường phát triển:** STM32CubeIDE là môi trường chính để cấu hình phần cứng, build và nạp chương trình. Dự án cũng có cấu trúc hỗ trợ thêm cho Keil MDK-ARM và IAR EWARM.
 
 ---
 
@@ -72,20 +116,22 @@ _Màn hình sóng PPG thời gian thực_
 
 ### Bảng kết nối linh kiện
 
-| STM32F429 Pin | Module ngoại vi   | Chức năng               |
-| ------------- | ----------------- | ----------------------- |
-| **PA8**       | MAX30102 / DS1307 | I2C3_SCL (chung bus)    |
-| **PC9**       | MAX30102 / DS1307 | I2C3_SDA (chung bus)    |
-| **PA9**       | UART Telemetry    | USART1_TX (921600 baud) |
-| **PA10**      | UART Telemetry    | USART1_RX (921600 baud) |
-| **PF6**       | Buzzer thụ động   | TIM10_CH1 PWM (AF3)     |
-| **PA0**       | Nút B1 trên board | EXTI0 (nhấn.start/stop) |
-| **PG13**      | LED LD3 (xanh lá) | ALERT_LED_1 - cảnh báo  |
-| **PG14**      | LED LD4 (đỏ)      | ALERT_LED_2 - cảnh báo  |
+| STM32F429 Pin | Module ngoại vi | Chức năng |
+| -- | -- | -- |
+| **PA8** | MAX30102 / DS1307 | Chân SCL của giao tiếp I2C3, dùng chung cho cảm biến MAX30102 và module RTC DS1307. |
+| **PC9** | MAX30102 / DS1307 | Chân SDA của giao tiếp I2C3, dùng chung cho cảm biến MAX30102 và module RTC DS1307. |
+| **PA9** | UART Telemetry | Chân truyền dữ liệu USART1_TX, dùng để gửi dữ liệu telemetry ra máy tính với baudrate 921600. |
+| **PA10** | UART Telemetry | Chân nhận dữ liệu USART1_RX, hỗ trợ giao tiếp UART với máy tính hoặc thiết bị ngoài. |
+| **PF6** | Buzzer thụ động | Ngõ ra PWM từ TIM10_CH1, dùng để điều khiển buzzer phát âm thanh thông báo và cảnh báo. |
+| **PA0** | Nút B1 trên board | Chân ngắt ngoài EXTI0, dùng để nhận thao tác nhấn nút vật lý trên board. |
+| **PG13** | LED LD3 xanh lá | LED cảnh báo thứ nhất, được điều khiển để hiển thị trạng thái cảnh báo của hệ thống. |
+| **PG14** | LED LD4 đỏ | LED cảnh báo thứ hai, hoạt động luân phiên với LED LD3 khi có cảnh báo bất thường. |
 
-### Giao tiếp I2C3 (chung bus, 100 kHz)
+### Giao tiếp I2C3
 
-```
+Hệ thống sử dụng bus I2C3 để kết nối đồng thời cảm biến MAX30102 và module RTC DS1307. Hai thiết bị này dùng chung hai đường tín hiệu SCL và SDA, nhưng có địa chỉ I2C khác nhau nên vi điều khiển có thể phân biệt khi giao tiếp.
+
+```text
 STM32F429 (I2C3)
   ├── PA8 (SCL) ──┬── MAX30102 SCL  (địa chỉ 0x57)
   │                └── DS1307 SCL    (địa chỉ 0x68)
@@ -94,19 +140,23 @@ STM32F429 (I2C3)
                    └── DS1307 SDA
 ```
 
-> **Lưu ý:** Hai thiết bị I2C3 được truy xuất tuần tự bởi mutex FreeRTOS, đảm bảo không xung đột bus.
+> **Lưu ý:** MAX30102 và DS1307 dùng chung bus I2C3 tốc độ 100 kHz. Trong chương trình, việc truy cập bus được đồng bộ bằng mutex của FreeRTOS để tránh trường hợp hai tác vụ cùng sử dụng I2C tại một thời điểm.
 
-### Giao tiếp LCD (LTDC + SPI5)
+### Giao tiếp LCD
 
-```
+Màn hình ILI9341 TFT LCD 240x320 px được điều khiển bằng giao tiếp LTDC để truyền dữ liệu hình ảnh dạng RGB565. Ngoài ra, SPI5 được sử dụng để gửi các lệnh cấu hình và khởi tạo thanh ghi cho màn hình.
+
+```text
 STM32F429 ── LTDC (song song RGB565) ── ILI9341 LCD 240x320
              SPI5 (PF7/PF8/PF9) ── LCD init registers
              PC1 (CS), PC2 (RESET), PD13 (D/C)
 ```
 
-### Giao tiếp SDRAM (FMC)
+### Giao tiếp SDRAM
 
-```
+SDRAM ngoài được kết nối với STM32F429 thông qua bộ điều khiển FMC Bank 2 với bus dữ liệu 16-bit. Bộ nhớ này được sử dụng làm frame buffer cho TouchGFX, giúp lưu trữ dữ liệu khung hình khi hiển thị giao diện đồ họa trên LCD.
+
+```text
 STM32F429 ── FMC Bank 2 (16-bit) ── SDRAM MT48LC4M16A2
              PF0-PF5, PF11-PF15, PG0-PG1, PG4-PG5, PG8, PG15
              PD0-PD1, PD8-PD10, PD14-PD15, PE0-PE15, PC0, PB5-PB6
@@ -121,248 +171,237 @@ _Sơ đồ khối tổng quan hệ thống_
 
 ### Kiến trúc tổng thể
 
-Hệ thống được thiết kế theo mô hình **pipeline song song** với 4 luồng FreeRTOS:
+Hệ thống được tổ chức theo mô hình pipeline song song, trong đó mỗi nhóm chức năng chính được tách thành một tác vụ riêng. Cách thiết kế này giúp quá trình thu thập dữ liệu, xử lý tín hiệu, hiển thị giao diện và truyền dữ liệu UART có thể hoạt động độc lập nhưng vẫn phối hợp với nhau thông qua các cơ chế đồng bộ.
 
-```
+```text
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│  SensorTask  │────▶│   DspTask   │────▶│  GUI_Task   │     │  Telemetry  │
-│  (Thu thập)  │     │  (Xử lý)   │     │  (Hiển thị) │     │   (UART)    │
+│ SensorTask  │────▶│   DspTask   │────▶│  GUI_Task   │     │ Telemetry   │
+│ Thu thập    │     │ Xử lý       │     │ Hiển thị    │     │ UART        │
 └─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
        │                   │                   │                    │
-   MAX30102            DSP Filters          TouchGFX           USART1
+   MAX30102            DSP Filters          TouchGFX             USART1
    I2C FIFO          BPM/SpO2/SQI         LCD 240x320        921600 baud
 ```
 
+Dữ liệu được lấy từ cảm biến MAX30102, sau đó đưa qua hàng đợi đến khối xử lý DSP. Kết quả sau xử lý được công bố cho giao diện TouchGFX để hiển thị lên LCD. Song song với đó, các dữ liệu đo, trạng thái hệ thống và sự kiện cảnh báo được định dạng và truyền ra ngoài thông qua UART telemetry.
+
 ### Thành phần phần cứng và vai trò
 
-| Thành phần        | Vai trò                                                                      |
-| ----------------- | ---------------------------------------------------------------------------- |
-| **STM32F429ZIT6** | Vi điều khiển chính, Cortex-M4@180MHz, điều phối toàn bộ hệ thống            |
-| **MAX30102**      | Cảm biến quang PPG, phát tia hồng ngoại/đỏ, thu tín hiệu phản xạ từ ngón tay |
-| **DS1307**        | Đồng hồ thời gian thực, giữ timestamp cho bản ghi đo                         |
-| **ILI9341 LCD**   | Màn hình hiển thị giao diện đồ họa 240x320 px                                |
-| **SDRAM**         | Bộ nhớ đệm frame buffer cho TouchGFX (double buffering)                      |
-| **Buzzer**        | Phát âm thanh cảnh báo và thông báo                                          |
-| **LED LD3/LD4**   | Đèn cảnh báo nhấp nháy khi vượt ngưỡng BPM/SpO2                              |
+| Thành phần | Vai trò |
+| -- | -- |
+| **STM32F429ZIT6** | Vi điều khiển trung tâm của hệ thống, đảm nhiệm việc điều phối các ngoại vi, chạy FreeRTOS, xử lý tín hiệu và điều khiển giao diện hiển thị. |
+| **MAX30102** | Cảm biến quang học PPG, sử dụng LED đỏ và hồng ngoại để thu tín hiệu phản xạ từ ngón tay, phục vụ tính BPM và SpO2. |
+| **DS1307** | Module đồng hồ thời gian thực, cung cấp thời gian cho hệ thống và timestamp cho các bản ghi lịch sử đo. |
+| **ILI9341 LCD** | Màn hình LCD TFT 240x320 px, dùng để hiển thị giao diện đồ họa, thông số đo và dạng sóng PPG. |
+| **SDRAM** | Bộ nhớ ngoài dùng làm frame buffer cho TouchGFX, hỗ trợ hiển thị đồ họa trên LCD. |
+| **Buzzer** | Thiết bị phát âm thanh thông báo, dùng cho các trạng thái như khởi động, đo xong, đo không hợp lệ và cảnh báo. |
+| **LED LD3/LD4** | Hai LED cảnh báo trên board, nhấp nháy luân phiên khi hệ thống phát hiện BPM hoặc SpO2 vượt ngưỡng. |
 
 ### Thành phần phần mềm và vai trò
 
-| Thành phần             | Vị trí                                   | Vai trò                                                                         |
-| ---------------------- | ---------------------------------------- | ------------------------------------------------------------------------------- |
-| **SensorTask**         | `Core/Src/main.c` → `App_DefaultTask()`  | Đọc FIFO MAX30102 mỗi 20ms, đọc RTC 1Hz, điều khiển buzzer/LED                  |
-| **DspTask**            | `Application/dsp_task.c`                 | Chạy PPG engine 100Hz: phát hiện đỉnh, tính BPM, SpO2, SQI, lọc tín hiệu        |
-| **GUI_Task**           | TouchGFX framework                       | Render giao diện, đọc kết quả DSP qua seqlock, hiển thị lên LCD                 |
-| **TelemetryTask**      | `Telemetry/telemetry_service.c`          | Định dạng CSV và gửi dữ liệu qua USART1                                         |
-| **MAX30102 Driver**    | `Drivers/MAX30102/`                      | Giao tiếp I2C với cảm biến, cấu hình FIFO, đọc raw samples                      |
-| **DS1307 Driver**      | `Drivers/DS1307/`                        | Giao tiếp I2C với RTC, đọc/ghi thời gian BCD                                    |
-| **DSP Filters**        | `DSP/`                                   | Moving Average, Median, Lowpass Butterworth bậc 2                               |
-| **PPG Engine**         | `DSP/ppg_measurement.c`                  | Phát hiện đỉnh, khoảng RR, tính BPM trung vị                                    |
-| **SpO2 Estimator**     | `DSP/spo2_estimator.c`                   | Tính SpO2 bằng ratio-of-ratios với calibration thực nghiệm                      |
-| **Medical Alert**      | `Config/alert_config.h`                  | Cảnh báo BPM thấp/thấp, SpO2 thấp với hysteresis thời gian                      |
-| **TouchGFX GUI**       | `TouchGFX/gui/`                          | 8 màn hình: Boot, Home, Dashboard, Waveform, History, DateTime, Settings, About |
-| **Application Bridge** | `Application/application_gui_bridge.cpp` | Kết nối giữa DSP task và GUI qua seqlock (lock-free)                            |
+| Thành phần | Vị trí | Vai trò |
+| -- | -- | -- |
+| **SensorTask** | `Application/app_init.c` | Đọc FIFO của MAX30102 theo chu kỳ, đưa mẫu RED/IR thô vào hàng đợi cho DSP, đồng thời xử lý RTC, buzzer và LED cảnh báo. |
+| **DspTask** | `Application/dsp_task.c` | Nhận dữ liệu thô từ hàng đợi, chạy engine PPG, tính BPM, SpO2, SQI, cập nhật cảnh báo, lưu lịch sử và công bố kết quả cho GUI. |
+| **GUI_Task** | TouchGFX framework | Render giao diện người dùng, đọc snapshot kết quả đo từ DSP và hiển thị lên LCD. |
+| **TelemetryTask** | `Telemetry/telemetry_service.c` | Nhận các thông điệp telemetry, định dạng thành CSV và gửi ra ngoài qua USART1. |
+| **MAX30102 Driver** | `Drivers/MAX30102/` | Cấu hình cảm biến MAX30102, thiết lập FIFO, chế độ SpO2 và đọc dữ liệu RED/IR thô qua I2C. |
+| **DS1307 Driver** | `Drivers/DS1307/` | Đọc và ghi thời gian thực từ module DS1307 qua I2C, chuyển đổi dữ liệu dạng BCD sang thời gian hệ thống. |
+| **DSP Filters** | `DSP/` | Cung cấp các bộ lọc tín hiệu như Moving Average, Median và Lowpass Butterworth để làm mượt tín hiệu PPG. |
+| **PPG Engine** | `DSP/ppg_measurement.c` | Quản lý trạng thái đo, phát hiện ngón tay, ổn định tín hiệu, phát hiện đỉnh PPG và tính BPM. |
+| **SpO2 Estimator** | `DSP/spo2_estimator.c` | Ước lượng SpO2 từ dữ liệu RED/IR bằng thuật toán ratio-of-ratios trên cửa sổ trượt. |
+| **Medical Alert** | `Application/medical_alert_service.c` | Kiểm tra ngưỡng BPM thấp, BPM cao và SpO2 thấp; sử dụng cơ chế xác nhận theo thời gian để tránh cảnh báo sai. |
+| **TouchGFX GUI** | `TouchGFX/gui/` | Xây dựng các màn hình giao diện như Boot, Home, Dashboard, Waveform, History và DateTime Settings. |
+| **Application Bridge** | `Application/application_gui_bridge.cpp` | Là lớp trung gian giữa phần xử lý DSP và giao diện TouchGFX, chuyển đổi dữ liệu `PpgResult` thành snapshot cho GUI. |
 
 ### Đồng bộ hóa giữa các luồng
 
-| Cơ chế              | Vị trí                   | Mục đích                                                        |
-| ------------------- | ------------------------ | --------------------------------------------------------------- |
-| **I2C3 Mutex**      | `Application/app_init.c` | Truy xuất tuần tự MAX30102 + DS1307 trên cùng bus               |
-| **PpgQueue (SPSC)** | `DSP/ppg_types.h`        | Hàng đợi lock-free chuyển mẫu thô từ Sensor → DSP               |
-| **Seqlock**         | `Application/dsp_task.c` | DSP ghi, GUI đọc PpgResult không bị xé dữ liệu (dùng `__DMB()`) |
-| **History Mutex**   | `Application/dsp_task.c` | Đồng bộ ghi/đọc lịch sử đo giữa DSP và GUI                      |
-| **Atomic Word**     | `DSP/dsp_task.c`         | Chuyển chế độ lọc và cửa sổ filter từ GUI → DSP                 |
-
----
+| Cơ chế | Vị trí | Mục đích |
+| -- | -- | -- |
+| **I2C3 Mutex** | `Application/app_init.c` | Đồng bộ truy cập bus I2C3 giữa MAX30102 và DS1307, tránh hai thao tác I2C xảy ra cùng lúc. |
+| **PpgQueue SPSC** | `Utilities/ppg_sample_queue.c` | Hàng đợi một producer, một consumer dùng để chuyển mẫu PPG thô từ SensorTask sang DspTask mà không cần khóa nặng. |
+| **Seqlock** | `Application/dsp_task.c` | Cho phép DspTask ghi kết quả và GUI đọc kết quả một cách an toàn, tránh đọc phải dữ liệu đang ghi dở. |
+| **History Mutex** | `Application/dsp_task.c` | Bảo vệ vùng dữ liệu lịch sử đo khi DspTask ghi và GUI đọc cùng lúc. |
+| **Atomic Word** | `Application/dsp_task.c` | Truyền yêu cầu đổi chế độ lọc hoặc cửa sổ lọc từ GUI sang DspTask bằng các biến nguyên đơn giản. |
 
 ## ĐẶC TẢ HÀM
 
-### 1. Hàm khởi tạo MAX30102
+### 1. Hàm khởi tạo cảm biến MAX30102
 
 ```c
 /**
- *  Khởi tạo cảm biến MAX30102 ở chế độ SpO2.
- *  Cấu hình FIFO: không lọc trung bình,rollover enabled, almost-full=15.
- *  Cấu hình LED: RED + IR, dòng ~6.4 mA mỗi kênh.
- *  Tốc độ lấy mẫu: 100 Hz, độ phân giải 18-bit.
- *  @return HAL_OK nếu thành công, HAL_ERROR nếu PART_ID không khớp (0x15)
+ * Khởi tạo cảm biến MAX30102 ở chế độ SpO2.
+ * Cấu hình FIFO, tốc độ lấy mẫu, độ phân giải ADC và dòng LED RED/IR.
+ *
+ * @param hi2c Con trỏ đến I2C handle dùng để giao tiếp với MAX30102.
+ * @return MAX30102_OK nếu thành công, hoặc mã lỗi nếu cảm biến không phản hồi,
+ *         sai PART_ID, lỗi I2C hoặc tham số không hợp lệ.
  */
-HAL_StatusTypeDef MAX30102_Init(I2C_HandleTypeDef *hi2c);
+Max30102Status MAX30102_Init(I2C_HandleTypeDef* hi2c);
 ```
 
 ### 2. Hàm đọc FIFO MAX30102
 
 ```c
 /**
- *  Đọc tối đa `count` mẫu từ FIFO của MAX30102.
- *  Mỗi mẫu gồm 6 byte: 3 byte RED (18-bit) + 3 byte IR (18-bit).
- *  Dữ liệu được lưu vào mảng `red` và `ir` (uint32_t).
- *  @param hi2c   Con trỏ I2C handle
- *  @param red    Mảng đầu ra giá trị RED
- *  @param ir     Mảng đầu ra giá trị IR
- *  @param count  Số mẫu tối đa cần đọc
- *  @return Số mẫu thực tế đã đọc từ FIFO
+ * Đọc các mẫu RED/IR thô từ FIFO của MAX30102.
+ * Mỗi mẫu gồm 6 byte: 3 byte RED và 3 byte IR, sau đó được đưa về giá trị 18-bit.
+ *
+ * @param samples   Mảng đầu ra chứa các mẫu đọc được.
+ * @param maxSamples Số mẫu tối đa cho phép đọc trong một lần gọi.
+ * @param readCount Con trỏ lưu số mẫu thực tế đã đọc.
+ * @return MAX30102_OK nếu đọc thành công, hoặc mã lỗi tương ứng.
  */
-uint32_t MAX30102_ReadFIFO(I2C_HandleTypeDef *hi2c,
-                            uint32_t *red, uint32_t *ir,
-                            uint32_t count);
+Max30102Status MAX30102_ReadFifo(Max30102Sample* samples,
+                                 uint8_t maxSamples,
+                                 uint8_t* readCount);
 ```
 
-### 3. Hàm xử lý DSP chính
+### 3. Hàm đưa mẫu PPG vào engine xử lý
 
 ```c
 /**
- *  Hàm xử lý một mẫu PPG thô qua chuỗi lọc và phát hiện đỉnh.
- *  Pipeline: DC tracking → Optional Filter (Median/Lowpass/MA) → Peak Detection
- *  @param redRaw   Giá trị RED thô từ cảm biến
- *  @param irRaw    Giá trị IR thô từ cảm biến
- *  @param result   Kết quả đầu ra (BPM, SpO2, SQI, trạng thái)
- *  @return true nếu có kết quả mới, false nếu đang chờ đủ dữ liệu
+ * Nhận một mẫu PPG thô từ SensorTask và cập nhật state machine đo.
+ * Hàm thực hiện phát hiện ngón tay, ổn định tín hiệu, trừ baseline DC,
+ * lọc tín hiệu, phát hiện đỉnh và cập nhật dữ liệu BPM/SpO2/SQI nội bộ.
+ *
+ * @param sample Con trỏ đến mẫu PPG thô gồm sequence, timestampMs, redRaw và irRaw.
  */
-bool Dsp_ProcessSample(uint32_t redRaw, uint32_t irRaw, PpgResult *result);
+void Ppg_PushSample(const PpgRawSample* sample);
 ```
 
-### 4. Hàm tính SpO2
+### 4. Hàm lấy kết quả đo PPG
 
 ```c
 /**
- *  Tính SpO2 bằng thuật toán ratio-of-ratios.
- *  Sử dụng cửa sổ trượt 4 giây, mỗi giây chia thành 1 sub-block.
- *  Tính ratio R = (AC_RED/DC_RED) / (AC_IR/DC_IR).
- *  Polynomial calibration: SpO2 = 94.845 + 30.354*R - 45.060*R^2
- *  @param state   Trạng thái PPG engine (chứa mẫu IR/RED đã lưu)
- *  @return Giá trị SpO2 (70-100%), hoặc 0 nếu chưa đủ dữ liệu
+ * Sao chép kết quả đo hiện tại từ engine PPG ra ngoài.
+ * Kết quả gồm trạng thái đo, BPM, SpO2, SQI, waveform, số peak,
+ * dữ liệu raw/filtered và thông tin phiên đo.
+ *
+ * @param out Con trỏ đến biến PpgResult nhận dữ liệu đầu ra.
  */
-float SpO2_Estimate(PpgEngineState *state);
+void Ppg_GetResult(PpgResult* out);
 ```
 
-### 5. Hàm lọc trung bình trượt
+### 5. Hàm tính SpO2
 
 ```c
 /**
- *  Áp dụng bộ lọc trung bình trượt (moving average) với cửa sổ N.
- *  Triển khai bằng running-sum, độ phức tạp O(1)/mẫu.
- *  @param state   Trạng thái bộ lọc (chứa buffer vòng và tổng chạy)
- *  @param input   Giá trị đầu vào (mẫu thô hoặc đã lọc)
- *  @return Giá trị đầu ra sau khi lọc
+ * Xử lý mẫu RED/IR thô để ước lượng SpO2 bằng thuật toán ratio-of-ratios.
+ * Dữ liệu được gom theo các block 1 giây và tính trên cửa sổ trượt 4 giây.
+ *
+ * @param est         Trạng thái bộ ước lượng SpO2.
+ * @param redRaw      Giá trị RED thô từ cảm biến.
+ * @param irRaw       Giá trị IR thô từ cảm biến.
+ * @param timestampMs Thời điểm lấy mẫu, đơn vị mili giây.
+ * @param out         Con trỏ nhận kết quả SpO2, ratio, DC và AC.
+ * @return SPO2_STATUS_OK nếu có kết quả hợp lệ, SPO2_STATUS_NOT_READY nếu chưa đủ dữ liệu,
+ *         hoặc SPO2_STATUS_INVALID_SIGNAL nếu tín hiệu không đạt yêu cầu.
  */
-float MovingAverage_Process(MovingAverageState *state, float input);
+Spo2Status Spo2_Process(Spo2Estimator* est,
+                        uint32_t redRaw,
+                        uint32_t irRaw,
+                        uint32_t timestampMs,
+                        Spo2Result* out);
 ```
 
-### 6. Hàm lọc Butterworth bậc thấp
+### 6. Hàm lọc trung bình trượt
 
 ```c
 /**
- *  Áp dụng bộ lọc Butterworth bậc 2, tần số cắt 4 Hz, fs = 100 Hz.
- *  Hệ số: b = [0.020083, 0.040167, 0.020083], a = [1.0, -1.561018, 0.641352]
- *  Triển khai Direct Form II Transposed (2 biến trạng thái).
- *  @param state   Trạng thái bộ lọc (2 biến trạng thái)
- *  @param input   Giá trị đầu vào
- *  @return Giá trị đầu ra sau khi lọc
+ * Áp dụng bộ lọc trung bình trượt cho tín hiệu đầu vào.
+ * Bộ lọc dùng buffer vòng và tổng chạy nên có độ phức tạp O(1) cho mỗi mẫu.
+ *
+ * @param filter Trạng thái bộ lọc moving average.
+ * @param input  Giá trị đầu vào.
+ * @param output Con trỏ nhận giá trị sau khi lọc.
+ * @return MOVING_AVERAGE_STATUS_OK khi cửa sổ đã đầy,
+ *         MOVING_AVERAGE_STATUS_NOT_READY khi chưa đủ mẫu.
  */
-float Lowpass_Process(LowpassState *state, float input);
+MovingAverageStatus MovingAverage_Process(MovingAverageFilter* filter,
+                                          int32_t input,
+                                          int32_t* output);
 ```
 
-### 7. Hàm hiển thị MetricCard (TouchGFX)
+### 7. Hàm lọc thông thấp Butterworth
 
 ```c
 /**
- *  Widget hiển thị một chỉ số đo lớn (BPM, SpO2, SQI).
- *  Gồm: thanh accent màu ở trên (3px), nhãn phụ, giá trị lớn, đơn vị.
- *  @param value       Giá trị cần hiển thị (int hoặc float)
- *  @param unit        Chuỗi đơn vị ("bpm", "%")
- *  @param accentColor Màu thanh accent (xanh, xanh lá, vàng)
+ * Áp dụng bộ lọc thông thấp Butterworth bậc 2 cho tín hiệu PPG.
+ * Bộ lọc dùng cấu trúc Direct Form II Transposed, phù hợp cho hệ thống nhúng.
+ *
+ * @param f     Trạng thái bộ lọc lowpass.
+ * @param input Giá trị tín hiệu đầu vào.
+ * @return Giá trị tín hiệu sau khi lọc.
  */
-void MetricCard::update(int value, const char *unit, touchgfx::Color::ColorName accentColor);
+int32_t Lowpass_Process(LowpassFilter* f, int32_t input);
 ```
 
-### 8. Hàm vẽ sóng PPG (Waveform)
+### 8. Hàm cập nhật cảnh báo y tế
 
 ```c
 /**
- *  Vẽ đồ thị PPG 240 điểm lên CanvasWidget.
- *  Tín hiệu được nghịch quanh tâm để đỉnh systolic hiển thị lên trên.
- *  Hiển thị đường lưới mờ, đánh dấu đỉnh phát hiện được (tối đa 12 đỉnh).
- *  @param canvas   Con trỏ canvas để vẽ
- *  @param width    Chiều rộng vùng vẽ (240 px)
- *  @param height   Chiều dài vùng vẽ (156 px)
- *  @param data     Mảng 240 giá trị PPG đã xử lý
- *  @param peaks    Mảng chỉ số đỉnh, numPeaks đỉnh
+ * Cập nhật trạng thái cảnh báo dựa trên BPM, SpO2 và trạng thái đo hiện tại.
+ * Cảnh báo chỉ được xét khi hệ thống đang đo, tín hiệu ổn định và giá trị hợp lệ.
+ * Các ngưỡng được cấu hình trong alert_config.h.
+ *
+ * @param update Dữ liệu đo hiện tại gồm BPM, SpO2, cờ hợp lệ, trạng thái đo và timestamp.
  */
-void WaveformView::drawLineGraph(CanvasWidget *canvas,
-                                  int width, int height,
-                                  const int16_t *data,
-                                  const uint16_t *peaks, uint8_t numPeaks);
+void MedicalAlert_Update(const MedicalMeasurementUpdate* update);
 ```
 
-### 9. Hàm cảnh báo y tế
+### 9. Hàm lấy trạng thái cảnh báo
 
 ```c
 /**
- *  Đánh giá BPM và SpO2 hiện tại so với ngưỡng cảnh báo.
- *  Ngưỡng: BPM thấp < 45, BPM cao > 120, SpO2 thấp < 92%.
- *  Hysteresis thời gian: xác nhận 2 giây để kích hoạt, 3 giây để tắt.
- *  Khi cảnh báo.active: LED LD3/LD4 nhấp nháy xen kẽ 300ms.
- *  @param bpm    Giá trị BPM hiện tại
- *  @param spo2   Giá trị SpO2 hiện tại
- *  @param result Kết quả cảnh báo (loại, trạng thái active/inactive)
+ * Trả về các cờ cảnh báo đang hoạt động, gồm BPM thấp, BPM cao và SpO2 thấp.
+ *
+ * @return Tập cờ MedicalAlertFlags đang active.
  */
-void MedicalAlert_Evaluate(float bpm, float spo2, AlertResult *result);
+MedicalAlertFlags MedicalAlert_GetActiveFlags(void);
 ```
 
-### 10. Hàm telemettry
+### 10. Hàm hiển thị MetricCard trên TouchGFX
+
+```cpp
+/**
+ * Gán giá trị hiển thị cho một thẻ thông số như BPM, SpO2 hoặc SQI.
+ * Nếu dữ liệu không hợp lệ, widget hiển thị "--" thay vì số đo.
+ *
+ * @param value Giá trị cần hiển thị.
+ * @param valid true nếu giá trị hợp lệ, false nếu không hợp lệ.
+ */
+void MetricCard::setValue(int32_t value, bool valid);
+```
+
+### 11. Hàm cập nhật màn hình Waveform
+
+```cpp
+/**
+ * Cập nhật đồ thị sóng PPG trên màn hình Waveform.
+ * Hàm lấy dữ liệu waveform từ presenter, chọn kênh IR/RED,
+ * vẽ đường tín hiệu và hiển thị các marker peak đã phát hiện.
+ */
+void WaveformView::refresh();
+```
+
+### 12. Hàm khởi động TelemetryTask
 
 ```c
 /**
- *  Khởi tạo dịch vụ telemettry UART.
- *  Tạo 2 hàng đợi FreeRTOS: event_queue (24 phần tử, ưu tiên cao)
- *  và waveform_queue (64 phần tử, cho phép rơi mẫu).
- *  Định dạng dữ liệu: CSV qua USART1 ở 921600 baud.
- *  Tất cả lệnh gọi publish đều non-blocking (timeout=0).
- *  @return HAL_OK nếu khởi tạo thành công
+ * Tạo các hàng đợi telemetry và khởi động task truyền dữ liệu UART.
+ * TelemetryTask định dạng dữ liệu thành CSV và gửi qua USART1.
+ * Các hàm publish dữ liệu được thiết kế non-blocking để không làm chậm pipeline đo.
  */
-HAL_StatusTypeDef Telemetry_Start(void);
+void Telemetry_Start(void);
 ```
-
 ---
 
 ## KẾT QUẢ
 
 ### Màn hình Boot
 
-![Boot Screen](../docs/images/boot_screen.png)
-_Màn hình khởi động với logo "PPG Analyzer", phiên bản Firmware v1.0.0 và thanh tiến trình 7 giai đoạn: Starting system → Initializing display → Checking sensor → Checking RTC → Checking storage → Loading configuration → Ready_
-
-### Màn hình chính (Home)
-
-![Home Screen](../docs/images/home_screen.png)
-_Màn hình chính với thanh trạng thái (trạng thái cảm biến, đồng hồ RTC) và 4 nút điều hướng: Measure (đo), Waveform (sóng), History (lịch sử), Clock (đồng hồ)_
-
-### Màn hình đo (Dashboard)
-
-![Dashboard Screen](../docs/images/dashboard_screen.png)
-_Màn hình đo chính hiển thị 3 thẻ chỉ số: BPM (nhịp tim), SpO2 (oxy máu), SQI (chất lượng tín hiệu). Thanh trạng thái đo ở trên cùng. Nút Start/Stop điều khiển bắt đầu/dừng đo_
-
-### Màn hình sóng PPG (Waveform)
-
-![Waveform Screen](../docs/images/waveform_screen.png)
-_Màn hình hiển thị sóng PPG thời gian thực. 3 nút điều khiển: chọn kênh (IR/RED), chế độ lọc (Raw/MovingAvg/Median/Lowpass/Med+LP), kích thước cửa sổ lọc. Đỉnh phát hiện được đánh dấu bằng chấm vàng_
-
-### Màn hình lịch sử (History)
-
-![History Screen](../docs/images/history_screen.png)
-_Màn hình lịch sử đo với phân trang, mỗi trang 5 bản ghi. Mỗi bản ghi hiển thị: thời gian, BPM, SpO2, SQI, trạng thái hợp lệ_
-
-### Màn hình cài đặt giờ (DateTime)
-
-![DateTime Screen](../docs/images/datetime_screen.png)
-_Màn hình cài đặt RTC với 6 trường (Năm/Tháng/Ngày/Giờ/Phút/Giây), nút bấm +/- để điều chỉnh. Hiển thị thời gian RTC hiện tại_
-
-### Kết quả chạy thực tế
-
-![Kết quả đo thực tế](../docs/images/actual_measurement.png)
-_Hình ảnh đo thực tế với ngón tay đặt trên cảm biến MAX30102, hiển thị BPM và SpO2 trên LCD_
-
-> **Lưu ý:** Chụp thêm ảnh thực tế từ thiết bị hoặc simulator và đặt vào thư mục `docs/images/` để bổ sung vào báo cáo.
+link video : 
 
 ---
 
