@@ -63,14 +63,14 @@ void HomeView::setupScreen()
     statusText.setPosition(layout::home::STATUS_TEXT_X, layout::home::STATUS_TEXT_Y,
                            layout::home::STATUS_TEXT_W, layout::home::STATUS_TEXT_H);
     statusText.setColor(theme::textSecondary());
-    statusText.setTypedText(TypedText(T_WCSMALLLEFT));
+    statusText.setTypedText(TypedText(T_WCMEDIUMLEFT));
     statusText.setWildcard1(statusBuffer);
     add(statusText);
 
     clockText.setPosition(static_cast<int16_t>(SCREEN_WIDTH - layout::home::CLOCK_W - 6),
                           layout::home::CLOCK_Y, layout::home::CLOCK_W, layout::home::CLOCK_H);
     clockText.setColor(theme::textPrimary());
-    clockText.setTypedText(TypedText(T_WCSMALLRIGHT));
+    clockText.setTypedText(TypedText(T_WCMEDIUMRIGHT));
     clockText.setWildcard1(clockBuffer);
     add(clockText);
 
