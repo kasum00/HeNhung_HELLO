@@ -53,37 +53,12 @@ MeasurementInvalidReason mapReason(PpgInvalidReason r)
     }
 }
 
-GuiConfigurationSnapshot makeDefaultConfig()
-{
-    GuiConfigurationSnapshot c{};
-    c.generation = 0U;
-    c.filterMode = FilterMode::MovingAverage;  /* khớp PPG engine default */
-    c.minimumSqiPercent = 45U;
-    c.loggingEnabled = true;
-    c.buzzerEnabled = true;
-    c.adaptiveLedEnabled = true;
-    c.brightnessPercent = 80U;
-    c.dirty = false;
-    return c;
-}
 } // namespace
 
 ApplicationGuiBridge::ApplicationGuiBridge()
     : ppg_(), generation_(1U),
-      resultReadyMs_(0U), wasResultReady_(false),
-      draftConfig_(makeDefaultConfig()),
-      activeConfig_(makeDefaultConfig())
+      resultReadyMs_(0U), wasResultReady_(false)
 {
-}
-
-bool ApplicationGuiBridge::draftDirty() const
-{
-    return (draftConfig_.filterMode != activeConfig_.filterMode) ||
-           (draftConfig_.minimumSqiPercent != activeConfig_.minimumSqiPercent) ||
-           (draftConfig_.loggingEnabled != activeConfig_.loggingEnabled) ||
-           (draftConfig_.buzzerEnabled != activeConfig_.buzzerEnabled) ||
-           (draftConfig_.adaptiveLedEnabled != activeConfig_.adaptiveLedEnabled) ||
-           (draftConfig_.brightnessPercent != activeConfig_.brightnessPercent);
 }
 
 void ApplicationGuiBridge::tick(uint32_t frameCounter)
@@ -131,39 +106,8 @@ void ApplicationGuiBridge::postCommand(const GuiCommand& command)
         DspTask_SetMaWindow(command.filterWindow);
         return;
     }
-    /* Settings commands — lưu vào draft config, apply khi user bấm Apply. */
-    switch (command.type)
-    {
-    case GuiCommandType::SetMinimumSqi:
-        draftConfig_.minimumSqiPercent = command.minimumSqiPercent;
-        break;
-    case GuiCommandType::SetLoggingEnabled:
-        draftConfig_.loggingEnabled = command.flag;
-        break;
-    case GuiCommandType::SetBuzzerEnabled:
-        draftConfig_.buzzerEnabled = command.flag;
-        break;
-    case GuiCommandType::SetAdaptiveLedEnabled:
-        draftConfig_.adaptiveLedEnabled = command.flag;
-        break;
-    case GuiCommandType::SetBrightness:
-        draftConfig_.brightnessPercent = command.brightnessPercent;
-        break;
-    case GuiCommandType::ApplySettings:
-        activeConfig_ = draftConfig_;
-        activeConfig_.dirty = false;
-        draftConfig_.dirty = false;
-        break;
-    case GuiCommandType::CancelSettings:
-        draftConfig_ = activeConfig_;
-        break;
-    case GuiCommandType::RestoreDefaults:
-        draftConfig_ = makeDefaultConfig();
-        break;
-    default:
-        mock_.postCommand(command);
-        break;
-    }
+    /* Các command còn lại (đo, scenario test...) do mock xử lý. */
+    mock_.postCommand(command);
 }
 
 void ApplicationGuiBridge::notifyScreenTransition()
@@ -336,26 +280,6 @@ bool ApplicationGuiBridge::getHistoryPage(uint16_t pageIndex, GuiHistoryPageSnap
     s.pageCount = (total == 0U) ? 0U
         : static_cast<uint16_t>((total + perPage - 1U) / perPage);
     s.status = (total == 0U) ? HistoryPageStatus::Empty : HistoryPageStatus::Ok;
-    return true;
-}
-
-bool ApplicationGuiBridge::getConfigurationSnapshot(GuiConfigurationSnapshot& s)
-{
-    s = draftConfig_;
-    s.generation = generation_++;
-    s.dirty = draftDirty();
-    return true;
-}
-
-bool ApplicationGuiBridge::getSystemInfoSnapshot(GuiSystemInfoSnapshot& s)
-{
-    s.projectName = "PPG Signal Analyzer";
-    s.firmwareVersion = "v1.0.0";
-    s.buildProfile = "Release";
-    s.mcu = "STM32F429ZIT6";
-    s.displayResolution = "240 x 320";
-    s.sensorName = "MAX30102";
-    s.algorithmStatus = "Real-time";
     return true;
 }
 

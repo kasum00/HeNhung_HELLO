@@ -27,16 +27,6 @@
         "Interactions": []
       },
       {
-        "Name": "Settings",
-        "Components": [],
-        "Interactions": []
-      },
-      {
-        "Name": "About",
-        "Components": [],
-        "Interactions": []
-      },
-      {
         "Name": "DateTimeSettings",
         "Components": [],
         "Interactions": []

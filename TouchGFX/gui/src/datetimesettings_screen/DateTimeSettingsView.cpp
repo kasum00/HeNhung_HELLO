@@ -19,17 +19,17 @@ namespace
 const char* const FIELD_LABELS[DateTimeSettingsView::FIELD_COUNT] =
     { "Year", "Month", "Day", "Hour", "Min", "Sec" };
 
-constexpr int16_t CUR_Y = 38;
+constexpr int16_t CUR_Y = 30;
 constexpr int16_t ROW_TOP = 60;
-constexpr int16_t ROW_H = 28;
-constexpr int16_t LABEL_X = 6;
-constexpr int16_t LABEL_W = 54;
-constexpr int16_t MINUS_X = 60;
-constexpr int16_t STEP_W = 30;
-constexpr int16_t VALUE_X = 94;
-constexpr int16_t VALUE_W = 54;
-constexpr int16_t PLUS_X = 150;
-constexpr int16_t STEP_H = 24;
+constexpr int16_t ROW_H = 24;
+constexpr int16_t LABEL_X = 4;
+constexpr int16_t LABEL_W = 50;
+constexpr int16_t MINUS_X = 56;
+constexpr int16_t STEP_W = 28;
+constexpr int16_t VALUE_X = 88;
+constexpr int16_t VALUE_W = 50;
+constexpr int16_t PLUS_X = 144;
+constexpr int16_t STEP_H = 20;
 constexpr uint8_t ID_PLUS_OFFSET = 10U;
 constexpr int16_t ID_READ = 100;
 constexpr int16_t ID_SET = 101;
@@ -78,9 +78,9 @@ void DateTimeSettingsView::setupScreen()
     background.setColor(theme::background());
     add(background);
 
-    currentText.setPosition(6, CUR_Y, SCREEN_WIDTH - 12, 16);
+    currentText.setPosition(4, CUR_Y, SCREEN_WIDTH - 8, 20);
     currentText.setColor(theme::textSecondary());
-    currentText.setTypedText(TypedText(T_WCSMALLLEFT));
+    currentText.setTypedText(TypedText(T_WCDEFAULTLEFT));
     currentText.setWildcard1(currentBuf);
     add(currentText);
 
@@ -88,7 +88,7 @@ void DateTimeSettingsView::setupScreen()
     {
         const int16_t y = static_cast<int16_t>(ROW_TOP + i * ROW_H);
 
-        fieldLabel[i].setPosition(LABEL_X, static_cast<int16_t>(y + 4), LABEL_W, 18);
+        fieldLabel[i].setPosition(LABEL_X, static_cast<int16_t>(y + 2), LABEL_W, 16);
         fieldLabel[i].setColor(theme::textSecondary());
         fieldLabel[i].setTypedText(TypedText(T_WCMEDIUMLEFT));
         Unicode::strncpy(labelBuf[i], FIELD_LABELS[i], 8);
@@ -102,7 +102,7 @@ void DateTimeSettingsView::setupScreen()
         minusButton[i].setAction(stepClicked);
         add(minusButton[i]);
 
-        fieldValue[i].setPosition(VALUE_X, static_cast<int16_t>(y + 3), VALUE_W, 20);
+        fieldValue[i].setPosition(VALUE_X, static_cast<int16_t>(y + 2), VALUE_W, 18);
         fieldValue[i].setColor(theme::textPrimary());
         fieldValue[i].setTypedText(TypedText(T_WCDEFAULTCENTER));
         fieldValue[i].setWildcard1(valueBuf[i]);
@@ -116,20 +116,20 @@ void DateTimeSettingsView::setupScreen()
         add(plusButton[i]);
     }
 
-    statusText.setPosition(6, 230, SCREEN_WIDTH - 12, 16);
+    statusText.setPosition(4, 200, SCREEN_WIDTH - 8, 14);
     statusText.setColor(theme::textSecondary());
     statusText.setTypedText(TypedText(T_WCSMALLCENTER));
     statusText.setWildcard1(statusBuf);
     add(statusText);
 
-    readButton.setup(8, 252, 108, 40);
+    readButton.setup(6, 216, 108, 36);
     readButton.setColors(theme::surfaceAlt(), theme::primaryDark(), theme::textPrimary());
     readButton.setLabel("Read RTC");
     readButton.setId(ID_READ);
     readButton.setAction(readClicked);
     add(readButton);
 
-    setButton.setup(124, 252, 108, 40);
+    setButton.setup(126, 216, 108, 36);
     setButton.setColors(theme::ok(), theme::primaryDark(), theme::textOnPrimary());
     setButton.setLabel("Set");
     setButton.setId(ID_SET);

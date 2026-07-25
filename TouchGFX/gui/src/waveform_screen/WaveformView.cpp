@@ -60,18 +60,18 @@ void WaveformView::setupScreen()
     /* Control row: channel (IR/RED) | filter mode (Raw/Mov Avg) | window (N). */
     const int16_t cy = layout::waveform::CTRL_Y;
     const int16_t ch = layout::waveform::CTRL_H;
-    channelButton.setup(8, cy, 52, ch);
+    channelButton.setup(6, cy, 50, ch);
     channelButton.setColors(theme::surface(), theme::primaryDark(), theme::textPrimary());
     channelButton.setLabel("IR");
     channelButton.setAction(channelClicked);
     add(channelButton);
 
-    modeButton.setup(64, cy, 100, ch);
+    modeButton.setup(60, cy, 92, ch);
     modeButton.setColors(theme::surface(), theme::primaryDark(), theme::textPrimary());
     modeButton.setAction(filterModeClicked);
     add(modeButton);
 
-    windowButton.setup(168, cy, 64, ch);
+    windowButton.setup(156, cy, 78, ch);
     windowButton.setColors(theme::surface(), theme::primaryDark(), theme::textPrimary());
     windowButton.setAction(windowClicked);
     add(windowButton);

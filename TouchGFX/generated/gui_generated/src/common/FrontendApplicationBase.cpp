@@ -19,10 +19,6 @@
 #include <gui/waveform_screen/WaveformPresenter.hpp>
 #include <gui/history_screen/HistoryView.hpp>
 #include <gui/history_screen/HistoryPresenter.hpp>
-#include <gui/settings_screen/SettingsView.hpp>
-#include <gui/settings_screen/SettingsPresenter.hpp>
-#include <gui/about_screen/AboutView.hpp>
-#include <gui/about_screen/AboutPresenter.hpp>
 #include <gui/datetimesettings_screen/DateTimeSettingsView.hpp>
 #include <gui/datetimesettings_screen/DateTimeSettingsPresenter.hpp>
 

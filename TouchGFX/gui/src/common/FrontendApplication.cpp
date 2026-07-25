@@ -18,10 +18,6 @@
 #include <gui/waveform_screen/WaveformPresenter.hpp>
 #include <gui/history_screen/HistoryView.hpp>
 #include <gui/history_screen/HistoryPresenter.hpp>
-#include <gui/settings_screen/SettingsView.hpp>
-#include <gui/settings_screen/SettingsPresenter.hpp>
-#include <gui/about_screen/AboutView.hpp>
-#include <gui/about_screen/AboutPresenter.hpp>
 #include <gui/datetimesettings_screen/DateTimeSettingsView.hpp>
 #include <gui/datetimesettings_screen/DateTimeSettingsPresenter.hpp>
 
@@ -42,9 +38,7 @@ ApplicationScreen toAppScreen(gui::ScreenId id)
     case gui::ScreenId::Dashboard:        return APP_SCREEN_DASHBOARD;
     case gui::ScreenId::Waveform:         return APP_SCREEN_WAVEFORM;
     case gui::ScreenId::History:          return APP_SCREEN_HISTORY;
-    case gui::ScreenId::Settings:         return APP_SCREEN_SETTINGS;
     case gui::ScreenId::DateTimeSettings: return APP_SCREEN_DATETIME_SETTINGS;
-    case gui::ScreenId::About:            return APP_SCREEN_ABOUT;
     default:                              return APP_SCREEN_UNKNOWN;
     }
 }
@@ -143,14 +137,6 @@ void FrontendApplication::performTransition(gui::ScreenId id)
         break;
     case gui::ScreenId::History:
         touchgfx::makeTransition<HistoryView, HistoryPresenter, touchgfx::NoTransition, Model>(
-            &currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
-        break;
-    case gui::ScreenId::Settings:
-        touchgfx::makeTransition<SettingsView, SettingsPresenter, touchgfx::NoTransition, Model>(
-            &currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
-        break;
-    case gui::ScreenId::About:
-        touchgfx::makeTransition<AboutView, AboutPresenter, touchgfx::NoTransition, Model>(
             &currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
         break;
     case gui::ScreenId::DateTimeSettings:

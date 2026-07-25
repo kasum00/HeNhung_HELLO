@@ -36,8 +36,6 @@ public:
     bool getMeasurementSnapshot(GuiMeasurementSnapshot& snapshot) override;
     bool getWaveformSnapshot(GuiWaveformSnapshot& snapshot) override;
     bool getHistoryPage(uint16_t pageIndex, GuiHistoryPageSnapshot& snapshot) override;
-    bool getConfigurationSnapshot(GuiConfigurationSnapshot& snapshot) override;
-    bool getSystemInfoSnapshot(GuiSystemInfoSnapshot& snapshot) override;
 
     /** @brief Returns the active test scenario. */
     MockScenario scenario() const { return signal.scenario(); }
@@ -45,7 +43,6 @@ public:
 private:
     void selectScenario(MockScenario scenario);
     void resolveMeasurementState();
-    bool draftDiffersFromActive() const;
 
     /* Sub-sources. */
     MockSignalGenerator signal;
@@ -64,10 +61,6 @@ private:
     MeasurementState measurementState;
     MeasurementInvalidReason measurementReason;
     bool resultStale;
-
-    /* Configuration (active + draft). */
-    GuiConfigurationSnapshot activeConfig;
-    GuiConfigurationSnapshot draftConfig;
 
     /* Waveform/measurement filter selection (applied immediately, mirrors the
        real engine's global filter mode + window). */

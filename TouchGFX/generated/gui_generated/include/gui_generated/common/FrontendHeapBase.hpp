@@ -22,10 +22,6 @@
 #include <gui/waveform_screen/WaveformPresenter.hpp>
 #include <gui/history_screen/HistoryView.hpp>
 #include <gui/history_screen/HistoryPresenter.hpp>
-#include <gui/settings_screen/SettingsView.hpp>
-#include <gui/settings_screen/SettingsPresenter.hpp>
-#include <gui/about_screen/AboutView.hpp>
-#include <gui/about_screen/AboutPresenter.hpp>
 #include <gui/datetimesettings_screen/DateTimeSettingsView.hpp>
 #include <gui/datetimesettings_screen/DateTimeSettingsPresenter.hpp>
 
@@ -55,10 +51,8 @@ public:
             touchgfx::meta::TypeList< DashboardView,
             touchgfx::meta::TypeList< WaveformView,
             touchgfx::meta::TypeList< HistoryView,
-            touchgfx::meta::TypeList< SettingsView,
-            touchgfx::meta::TypeList< AboutView,
             touchgfx::meta::TypeList< DateTimeSettingsView,
-            touchgfx::meta::Nil > > > > > > >
+            touchgfx::meta::Nil > > > > >
             > GeneratedViewTypes;
 
     /**
@@ -75,10 +69,8 @@ public:
             touchgfx::meta::TypeList< DashboardPresenter,
             touchgfx::meta::TypeList< WaveformPresenter,
             touchgfx::meta::TypeList< HistoryPresenter,
-            touchgfx::meta::TypeList< SettingsPresenter,
-            touchgfx::meta::TypeList< AboutPresenter,
             touchgfx::meta::TypeList< DateTimeSettingsPresenter,
-            touchgfx::meta::Nil > > > > > > >
+            touchgfx::meta::Nil > > > > >
             > GeneratedPresenterTypes;
 
     /**
