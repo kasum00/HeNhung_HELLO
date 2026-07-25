@@ -14,6 +14,7 @@ extern "C" {
 #include "temporary_history_store.h"
 #include "measurement_types.h"
 #include "alert_config.h"
+#include "telemetry_service.h"
 #include "stm32f4xx_hal.h"
 }
 
@@ -99,11 +100,20 @@ void ApplicationGuiBridge::postCommand(const GuiCommand& command)
         default:                        mode = PPG_FILTER_MOVING_AVERAGE; break;
         }
         DspTask_SetFilterMode(mode);
+        /* Log thay đổi cài đặt (event — luôn được phép, kể cả trước khi ổn định). */
+        TelemetrySettingEvent ev{};
+        ev.id = TELEMETRY_SETTING_FILTER_MODE;
+        ev.intValue = (int32_t)mode;
+        (void)Telemetry_PublishSettingChange(&ev);
         return;
     }
     if (command.type == GuiCommandType::SetFilterWindow)
     {
         DspTask_SetMaWindow(command.filterWindow);
+        TelemetrySettingEvent ev{};
+        ev.id = TELEMETRY_SETTING_FILTER_WINDOW;
+        ev.intValue = (int32_t)command.filterWindow;
+        (void)Telemetry_PublishSettingChange(&ev);
         return;
     }
     /* Các command còn lại (đo, scenario test...) do mock xử lý. */

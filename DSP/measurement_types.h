@@ -68,10 +68,6 @@ typedef struct
 
     MeasurementResultStatus status;
     MeasurementEndReason endReason;
-
-    /* Thông tin lưu trữ (giai đoạn này chỉ giữ mọi thứ trong RAM). */
-    bool    persistedToSd;    /**< Luôn false cho tới giai đoạn ghi SD sau. */
-    uint8_t storageRetryCount;
 } MeasurementHistoryRecord;
 
 #ifdef __cplusplus

@@ -690,7 +690,9 @@ void Ppg_PushSample(const PpgRawSample* sample)
                 runPeakDetector(sig, nowMs);
             }
 
-            /* SQI xấp xỉ từ tỉ lệ peak được chấp nhận (dùng để chặn SpO2). */
+            /* SQI: heuristic chất lượng hướng peak/BPM (tỉ lệ peak được chấp nhận).
+               Chỉ hiển thị Dashboard + đánh giá nhịp; KHÔNG dùng làm điều kiện hợp
+               lệ của SpO2 (SpO2 dùng chất lượng RED/IR riêng trong estimator). */
             const uint32_t totalPeaks = s_acceptedPeaks + s_rejectedPeaks;
             s_sqiPercent = (totalPeaks > 0U)
                 ? (100.0F * (float)s_acceptedPeaks / (float)totalPeaks) : 0.0F;
@@ -707,7 +709,11 @@ void Ppg_PushSample(const PpgRawSample* sample)
                 s_lastDcIr = sp.dcIr;
                 s_lastAcRed = sp.acRed;
                 s_lastAcIr = sp.acIr;
-                if ((sst == SPO2_STATUS_OK) && (s_sqiPercent >= PPG_SPO2_MIN_SQI))
+                /* Chất lượng riêng của SpO2: estimator xác nhận DC/AC RED+IR, đủ
+                   sample, không bão hòa, mẫu số khác 0, R hữu hạn và SpO2 trong dải
+                   sinh lý (SPO2_STATUS_OK). ĐỘC LẬP với SQI peak/BPM ở trên. */
+                const bool spo2QualityOk = (sst == SPO2_STATUS_OK);
+                if (spo2QualityOk)
                 {
                     s_latestSpo2 = sp.spo2;
                     s_latestSpo2Valid = true;
@@ -726,7 +732,7 @@ void Ppg_PushSample(const PpgRawSample* sample)
                 }
                 else
                 {
-                    s_latestSpo2Valid = false;  /* không bao giờ hiện giá trị cũ/SQI thấp */
+                    s_latestSpo2Valid = false;  /* không bao giờ hiện giá trị cũ / chất lượng xấu */
                 }
             }
         }
