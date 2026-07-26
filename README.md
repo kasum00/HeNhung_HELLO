@@ -40,27 +40,38 @@ Các kết quả BPM, SpO2, SQI và dạng sóng PPG được hiển thị trự
 7. **Phản hồi âm thanh:** Buzzer PWM phát các giai điệu khác nhau cho từng trạng thái như khởi động, đo hoàn tất, phép đo không hợp lệ hoặc cảnh báo bất thường.
 
 **Ảnh chụp minh họa:**
-
-![Ảnh minh họa](../docs/images/boot_screen.png)
-_Màn hình khởi động với thanh tiến trình_
-
-![Ảnh minh họa](../docs/images/home_screen.png)
-_Màn hình chính với 4 nút điều hướng_
-
-![Ảnh minh họa](../docs/images/dashboard_screen.png)
-_Màn hình đo BPM / SpO2 / SQI_
-
-![Ảnh minh họa](../docs/images/waveform_screen.png)
-_Màn hình sóng PPG thời gian thực_
-
-> **Lưu ý:** Nếu chưa có ảnh chụp thực tế, hãy thêm ảnh vào thư mục `docs/images/` và cập nhật đường dẫn ở trên. Có thể chụp từimulator hoặc từ thiết bị thật.
+<table align="center">
+  <tr>
+    <td align="center">
+      <b>Màn hình khởi động</b><br><br>
+      <img src="./docs/images/boot_screen.png" alt="Boot Screen" width="280"><br><br>
+      Hiển thị khi thiết bị được cấp nguồn và khởi tạo hệ thống.
+    </td>
+    <td align="center">
+      <b>Màn hình chính</b><br><br>
+      <img src="./docs/images/home_screen.png" alt="Home Screen" width="280"><br><br>
+      Cung cấp các chức năng điều hướng chính.
+    </td>
+  </tr>
+ <br><br>
+  <tr>
+    <td align="center">
+      <b>Màn hình hiển thị chỉ số</b><br><br>
+      <img src="./docs/images/dashboard_screen.png" alt="Dashboard Screen" width="280"><br><br>
+      Hiển thị BPM, SpO₂ và SQI theo thời gian thực.
+    </td>
+    <td align="center">
+      <b>Màn hình sóng PPG</b><br><br>
+      <img src="./docs/images/waveform_screen.png" alt="Waveform Screen" width="280"><br><br>
+      Hiển thị dạng sóng PPG theo thời gian thực.
+    </td>
+  </tr>
+</table>
 
 ---
-
 ## TÁC GIẢ
-
-- Tên nhóm:HELLO
-- Thành viên trong nhóm
+- Tên nhóm: **HELLO**
+- Thành viên trong nhóm:
   |STT|Họ tên|MSSV|Công việc|
   |--:|--|--|--|
   |1|Vũ Thu Huyền|20235348|Hiển thị LCD, xây dựng giao diện, hiệu ứng chuyển màn hình, xử lý ngắt nút nhấn|
@@ -96,7 +107,6 @@ _Màn hình sóng PPG thời gian thực_
 | 2 | MAX30102 | Cảm biến quang học dùng để thu tín hiệu PPG từ ngón tay, phục vụ tính toán nhịp tim BPM và nồng độ oxy trong máu SpO2. |
 | 3 | DS1307 | Module đồng hồ thời gian thực, dùng để cung cấp thời gian cho hệ thống và gắn timestamp cho các bản ghi lịch sử đo. |
 | 4 | Buzzer thụ động | Thiết bị phát âm thanh phản hồi, dùng cho các trạng thái như khởi động, đo hoàn tất, phép đo không hợp lệ và cảnh báo. |
-| 5 | Nguồn USB 5V | Nguồn cấp chính cho board STM32F429I-DISCO và các module ngoại vi trong hệ thống. |
 
 ### Phần mềm
 
@@ -112,7 +122,7 @@ _Màn hình sóng PPG thời gian thực_
 
 ---
 
-## SO ĐỒ SCHEMATIC
+## SƠ ĐỒ SCHEMATIC
 
 ### Bảng kết nối linh kiện
 
@@ -162,9 +172,6 @@ STM32F429 ── FMC Bank 2 (16-bit) ── SDRAM MT48LC4M16A2
              PD0-PD1, PD8-PD10, PD14-PD15, PE0-PE15, PC0, PB5-PB6
 ```
 
-![Sơ đồ khối hệ thống](../docs/images/system_block_diagram.png)
-_Sơ đồ khối tổng quan hệ thống_
-
 ---
 
 ## TÍCH HỢP HỆ THỐNG
@@ -203,7 +210,7 @@ Dữ liệu được lấy từ cảm biến MAX30102, sau đó đưa qua hàng 
 | -- | -- | -- |
 | **SensorTask** | `Application/app_init.c` | Đọc FIFO của MAX30102 theo chu kỳ, đưa mẫu RED/IR thô vào hàng đợi cho DSP, đồng thời xử lý RTC, buzzer và LED cảnh báo. |
 | **DspTask** | `Application/dsp_task.c` | Nhận dữ liệu thô từ hàng đợi, chạy engine PPG, tính BPM, SpO2, SQI, cập nhật cảnh báo, lưu lịch sử và công bố kết quả cho GUI. |
-| **GUI_Task** | TouchGFX framework | Render giao diện người dùng, đọc snapshot kết quả đo từ DSP và hiển thị lên LCD. |
+| **GUI_Task** | `TouchGFX framework` | Render giao diện người dùng, đọc snapshot kết quả đo từ DSP và hiển thị lên LCD. |
 | **TelemetryTask** | `Telemetry/telemetry_service.c` | Nhận các thông điệp telemetry, định dạng thành CSV và gửi ra ngoài qua USART1. |
 | **MAX30102 Driver** | `Drivers/MAX30102/` | Cấu hình cảm biến MAX30102, thiết lập FIFO, chế độ SpO2 và đọc dữ liệu RED/IR thô qua I2C. |
 | **DS1307 Driver** | `Drivers/DS1307/` | Đọc và ghi thời gian thực từ module DS1307 qua I2C, chuyển đổi dữ liệu dạng BCD sang thời gian hệ thống. |
@@ -399,9 +406,12 @@ void Telemetry_Start(void);
 
 ## KẾT QUẢ
 
-### Màn hình Boot
+### Ảnh lắp mạch:
+<p align="center">
+  <img src="./docs/images/circuit_diagram.jpg" alt="Ảnh lắp mạch" width="280">
+</p>
 
-link video : 
+### Link video : [Video demo](https://drive.google.com)
 
 ---
 
