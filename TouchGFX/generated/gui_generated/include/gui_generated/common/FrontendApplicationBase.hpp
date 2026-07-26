@@ -17,19 +17,19 @@ public:
 
     virtual void changeToStartScreen()
     {
-        gotoBootScreenNoTransition();
+        gotoWaveformScreenNoTransition();
     }
 
-    // Boot
-    void gotoBootScreenNoTransition();
+    // Waveform
+    void gotoWaveformScreenNoTransition();
 
 protected:
     touchgfx::Callback<FrontendApplicationBase> transitionCallback;
     FrontendHeap& frontendHeap;
     Model& model;
 
-    // Boot
-    void gotoBootScreenNoTransitionImpl();
+    // Waveform
+    void gotoWaveformScreenNoTransitionImpl();
 };
 
 #endif // FRONTENDAPPLICATIONBASE_HPP

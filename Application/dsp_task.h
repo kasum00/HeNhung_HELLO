@@ -17,10 +17,11 @@
  * không bao giờ biên dịch nó.
  */
 
-#include "ppg_types.h"
+#include "ppg_types.h"    /* PpgResult, PpgFilterMode, PpgState - tất cả type
+                               cần thiết cho giao tiếp giữa DSP task và GUI task. */
 
 #ifdef __cplusplus
-extern "C" {
+extern "C" {    /* Cho phép header này được include từ file C++ (TouchGFX generated). */
 #endif
 
 /**
@@ -34,18 +35,25 @@ void DspTask_Start(void);
  * @param out Đích, được điền một snapshot kết quả không bị xé.
  *
  * An toàn khi gọi từ GUI thread trong lúc DSP thread vẫn đang công bố.
+ * Dùng seqlock: retry nếu dữ liệu đang bị ghi, giới hạn 8 lần retry.
  */
 void DspTask_GetResult(PpgResult* out);
 
 /**
  * @brief Yêu cầu filter mode phân tích/hiển thị (áp dụng trên DSP thread).
  * @param mode RAW hoặc MOVING_AVERAGE. An toàn khi gọi từ GUI thread.
+ *
+ * Ghi vào biến volatile, DSP thread áp dụng ở chu kỳ tiếp theo.
+ * Giá trị -1 = "không có yêu cầu chờ" (sentinel value).
  */
 void DspTask_SetFilterMode(PpgFilterMode mode);
 
 /**
  * @brief Yêu cầu cửa sổ moving-average N mới (áp dụng trên DSP thread).
  * @param window 1..PPG_MA_WINDOW_MAX. An toàn khi gọi từ GUI thread.
+ *
+ * Ghi vào biến volatile, DSP thread áp dụng ở chu kỳ tiếp theo.
+ * Giá trị -1 = "không có yêu cầu chờ".
  */
 void DspTask_SetMaWindow(uint8_t window);
 
@@ -54,6 +62,7 @@ void DspTask_SetMaWindow(uint8_t window);
  *
  * GUI thread phải bọc các lần đọc TemporaryHistory_* bằng cặp này để một lần
  * finalize trên DSP thread không xé một bản ghi khi đang copy.
+ * Dùng FreeRTOS mutex (blocking, osWaitForever).
  */
 void DspTask_HistoryLock(void);
 void DspTask_HistoryUnlock(void);

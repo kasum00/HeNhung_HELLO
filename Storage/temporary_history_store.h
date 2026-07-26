@@ -12,6 +12,14 @@
  * GUI không bao giờ đụng mảng nội bộ — nó đọc bản sao qua các accessor này.
  *
  * @note  User-owned. Thuần C, không HAL / bộ nhớ động.
+ *
+ * LƯU Ý VỀ CÔNG THỨC POSITION TRONG CIRCULAR BUFFER:
+ *   pos = (writeIndex + 2*CAPACITY - 1 - newestIndex) % CAPACITY
+ *   - "+2*CAPACITY" đảm bảo biểu thức trước '%' LUÔN DƯƠNG.
+ *   - Trong C, phép '%'' với số âm có kết quả không xác định (implementation-defined).
+ *   - 2*CAPACITY = 40 đủ lớn để bù cho mọi giá trị writeIndex và newestIndex,
+ *     mà 40 % 20 = 0 nên không thay đổi kết quả phép chia dư.
+ *   - Chi tiết xem temporary_history_store.c (hàm GetByNewestIndex).
  */
 
 #include <stddef.h>
