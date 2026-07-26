@@ -411,7 +411,9 @@ void Telemetry_Start(void);
   <img src="./docs/images/circuit_diagram.jpg" alt="Ảnh lắp mạch" width="280">
 </p>
 
-### Link video : [Video demo](https://drive.google.com)
+### Video demo
+
+[Nhấn vào đây để xem video](https://drive.google.com/file/d/1P6XTGR9Iyrwe4dyKC_kbPtMCbvnRXaRE/view?usp=sharing)
 
 ---
 
