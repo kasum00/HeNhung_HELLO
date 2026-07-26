@@ -7,27 +7,27 @@
 ### Đề bài / Mục tiêu sản phẩm
 
 - Sử dụng STM32F429 và TouchGFX.
-- Liên tục lấy giá trị nhịp tim và SpO2. 
-- Hiển thị 2 thông số này lên màn hình ở với nhiều kiểu hiện thị. Bấm nút B1 để hoàn đổi giữa các kiểu hiên thị này:
+- Liên tục lấy giá trị nhịp tim và SpO₂. 
+- Hiển thị 2 thông số này lên màn hình ở với nhiều kiểu hiển thị. Bấm nút B1 để hoán đổi giữa các kiểu hiển thị này:
    - Màn hình 1: hiển thị giá trị real-time dạng số: 
    - Màn hình 2: đồ thị line.
 - Luôn luôn truyền dữ liệu realtime qua USART về máy tính.
-- Ngưỡng cố định khi nhịp tim hoặc lượng SpO2 dưới ngưỡng y tế cho phép
-- Luôn luôn kiểm tra xem nhịp tim và O2 có vượt ngưỡng không. Nếu vượt thì nháy 2 đèn led PG13, PG14.
+- Sử dụng ngưỡng cố định để cảnh báo khi nhịp tim hoặc SpO₂ thấp hơn ngưỡng y tế cho phép.
+- Hệ thống liên tục kiểm tra xem nhịp tim và O₂ có vượt ngưỡng không. Nếu vượt thì nháy 2 đèn led PG13, PG14.
 
 ### Hướng tiếp cận
 
 Hệ thống sử dụng cảm biến quang học MAX30102 để thu tín hiệu PPG từ ngón tay người dùng. Dữ liệu RED và IR thô được truyền về vi điều khiển STM32 thông qua giao tiếp I2C, sau đó được đưa vào khối xử lý tín hiệu số DSP.
 
-Tại khối DSP, tín hiệu được loại bỏ thành phần DC và lọc nhiễu bằng các bộ lọc như trung bình trượt, trung vị và Butterworth thông thấp. Sau khi tín hiệu ổn định, hệ thống phát hiện các đỉnh PPG để tính nhịp tim BPM, đồng thời sử dụng thuật toán ratio-of-ratios để ước lượng SpO2. Chất lượng tín hiệu được đánh giá thông qua chỉ số SQI.
+Tại khối DSP, tín hiệu được loại bỏ thành phần DC và lọc nhiễu bằng các bộ lọc như trung bình trượt, trung vị và Butterworth thông thấp. Sau khi tín hiệu ổn định, hệ thống phát hiện các đỉnh PPG để tính nhịp tim BPM, đồng thời sử dụng thuật toán ratio-of-ratios để ước lượng SpO₂. Chất lượng tín hiệu được đánh giá thông qua chỉ số SQI.
 
-Các kết quả BPM, SpO2, SQI và dạng sóng PPG được hiển thị trực tiếp trên màn hình LCD thông qua giao diện TouchGFX. Hệ điều hành FreeRTOS được sử dụng để chia hệ thống thành nhiều tác vụ chạy song song, gồm thu thập dữ liệu cảm biến, xử lý tín hiệu, cập nhật giao diện và truyền dữ liệu telemetry qua UART. Cách tổ chức này giúp hệ thống hoạt động ổn định và đáp ứng tốt yêu cầu thời gian thực.
+Các kết quả BPM, SpO₂, SQI và dạng sóng PPG được hiển thị trực tiếp trên màn hình LCD thông qua giao diện TouchGFX. Hệ điều hành FreeRTOS được sử dụng để chia hệ thống thành nhiều tác vụ chạy song song, gồm thu thập dữ liệu cảm biến, xử lý tín hiệu, cập nhật giao diện và truyền dữ liệu telemetry qua UART. Cách tổ chức này giúp hệ thống hoạt động ổn định và đáp ứng tốt yêu cầu thời gian thực.
 
 ### Sản phẩm
 
 1. **Đo nhịp tim (BPM):** Hệ thống nhận diện các đỉnh trong tín hiệu PPG để tính khoảng RR, sau đó ước lượng nhịp tim trong phạm vi 40-200 BPM.
 
-2. **Đo nồng độ oxy trong máu (SpO2):** Sử dụng dữ liệu RED và IR từ cảm biến MAX30102, áp dụng thuật toán ratio-of-ratios trên cửa sổ trượt 4 giây để ước lượng SpO2 trong phạm vi 70-100%.
+2. **Đo nồng độ oxy trong máu (SpO₂):** Sử dụng dữ liệu RED và IR từ cảm biến MAX30102, áp dụng thuật toán ratio-of-ratios trên cửa sổ trượt 4 giây để ước lượng SpO2 trong phạm vi 70-100%.
 
 3. **Đánh giá chất lượng tín hiệu (SQI):** Tính toán chỉ số chất lượng tín hiệu từ 0-100%, hỗ trợ phân loại mức tín hiệu thành Poor, Fair và Good để người dùng biết độ tin cậy của phép đo.
 
@@ -35,7 +35,7 @@ Các kết quả BPM, SpO2, SQI và dạng sóng PPG được hiển thị trự
 
 5. **Lưu lịch sử đo:** Sau mỗi phiên đo hợp lệ, kết quả được lưu tạm thời trong bộ nhớ RAM dạng vòng, kèm thời gian đo lấy từ module RTC DS1307.
 
-6. **Cảnh báo y tế:** Hệ thống theo dõi các ngưỡng bất thường như BPM thấp, BPM cao hoặc SpO2 thấp. Cảnh báo chỉ được kích hoạt khi giá trị vượt ngưỡng trong một khoảng thời gian xác nhận nhằm tránh báo sai do nhiễu tín hiệu.
+6. **Cảnh báo y tế:** Hệ thống theo dõi các ngưỡng bất thường như BPM thấp, BPM cao hoặc SpO₂ thấp. Cảnh báo chỉ được kích hoạt khi giá trị vượt ngưỡng trong một khoảng thời gian xác nhận nhằm tránh báo sai do nhiễu tín hiệu.
 
 7. **Phản hồi âm thanh:** Buzzer PWM phát các giai điệu khác nhau cho từng trạng thái như khởi động, đo hoàn tất, phép đo không hợp lệ hoặc cảnh báo bất thường.
 
@@ -99,7 +99,7 @@ Các kết quả BPM, SpO2, SQI và dạng sóng PPG được hiển thị trự
 
 - **LED cảnh báo:** Sử dụng các LED có sẵn trên board để hiển thị trạng thái cảnh báo khi nhịp tim hoặc SpO2 vượt ngưỡng cấu hình.
 
-### Bill of Materials
+### Danh mục linh kiện (Bill of Materials)
 
 | STT | Tên linh kiện | Ý nghĩa |
 | --: | -- | -- |
