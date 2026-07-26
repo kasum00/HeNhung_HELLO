@@ -74,11 +74,11 @@ Các kết quả BPM, SpO₂, SQI và dạng sóng PPG được hiển thị tr�
 - Thành viên trong nhóm:
   |STT|Họ tên|MSSV|Công việc|
   |--:|--|--|--|
-  |1|Vũ Thu Huyền|20235348|Hiển thị LCD, xây dựng giao diện, hiệu ứng chuyển màn hình, xử lý ngắt nút nhấn|
+  |1|Vũ Thu Huyền|20235348|Hiển thị LCD, xây dựng giao diện, hiệu ứng chuyển màn hình, xử lý ngắt nút nhấn, viết báo cáo và tổng hợp kết quả|
   |2|Trần Tuấn Anh|20235266|Lập trình đọc cảm biến MAX30102, giao tiếp I2C, cấu hình FIFO, lấy dữ liệu RED/IR thô|
   |3|Nguyễn Trần Gia Phụng|20235402|Xử lý tín hiệu PPG, lọc nhiễu, phát hiện đỉnh, tính BPM, SpO2 và SQI|
   |4|Nguyễn Thị Tuyết Mai|20235369|Xây dựng luồng FreeRTOS, quản lý task, queue dữ liệu, đồng bộ I2C, xử lý RTC DS1307 và lưu lịch sử đo|
-  |5|Nguyễn Thanh Hương|20235343|Lập trình cảnh báo LED/buzzer, truyền telemetry UART, kiểm thử hệ thống, viết báo cáo và tổng hợp kết quả|
+  |5|Nguyễn Thanh Hương|20235343|Lập trình cảnh báo LED/buzzer, truyền telemetry UART |
 
 
 ## MÔI TRƯỜNG HOẠT ĐỘNG
